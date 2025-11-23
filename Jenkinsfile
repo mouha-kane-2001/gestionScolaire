@@ -1,11 +1,16 @@
 pipeline {
     agent any
     stages {
-        stage('Debug PATH') {
+        stage('Liste les fichiers') {
             steps {
-                sh 'echo $PATH'
-                sh 'which node'
-                sh 'which docker'
+                sh 'ls -l /workspace'
+            }
+        }
+
+        stage('Check Tools') {
+            steps {
+                sh 'node -v'
+                sh 'docker --version'
             }
         }
     }
