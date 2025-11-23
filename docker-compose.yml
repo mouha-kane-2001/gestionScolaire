@@ -1,0 +1,64 @@
+services:
+  backend:
+    build:
+      context: ./apiGestionScolaire
+    container_name: laravel-backend
+    volumes:
+      - ./apiGestionScolaire:/var/www
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: laravel_db
+      DB_USERNAME: laravel_user
+      DB_PASSWORD: laravel_pass
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+  backend-nginx:
+    image: nginx:stable-alpine
+    container_name: backend-nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./apiGestionScolaire:/var/www
+      - ./docker/nginx/laravel.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./appGestionScolaire
+    container_name: angular-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend-nginx
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:15
+    container_name: postgres-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: laravel_db
+      POSTGRES_USER: laravel_user
+      POSTGRES_PASSWORD: laravel_pass
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
