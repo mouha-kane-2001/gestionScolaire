@@ -1,0 +1,57 @@
+.dashboard-parent {
+  padding: 1rem;
+}
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.badge {
+  font-size: 0.75em;
+}
+
+.text-success {
+  color: #4dbd74 !important;
+}
+
+.text-primary {
+  color: #321fdb !important;
+}
+
+.text-warning {
+  color: #f9b115 !important;
+}
+
+.text-danger {
+  color: #e55353 !important;
+}
+
+.bg-success {
+  background-color: #4dbd74 !important;
+}
+
+.bg-warning {
+  background-color: #f9b115 !important;
+}
+
+.bg-danger {
+  background-color: #e55353 !important;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .dashboard-parent {
+    padding: 0.5rem;
+  }
+
+  .d-flex.gap-2 {
+    flex-direction: column;
+    width: 100%;
+
+    button {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+  }
+}

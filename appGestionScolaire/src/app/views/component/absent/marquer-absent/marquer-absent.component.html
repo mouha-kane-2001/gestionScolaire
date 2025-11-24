@@ -1,0 +1,177 @@
+<div class="container-fluid py-3">
+  <div class="row">
+    <div class="col-12">
+
+      <!-- Carte principale - version compacte -->
+      <div class="card shadow-sm border-0 mb-3">
+        <div class="card-header bg-primary text-white py-2 px-3">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-calendar-x me-2"></i>
+            <h6 class="mb-0 fw-bold">Marquer une absence</h6>
+          </div>
+        </div>
+
+        <div class="card-body p-3">
+          <form [formGroup]="absenceForm" (ngSubmit)="onSubmit()">
+            <div class="row g-2 align-items-end">
+
+              <!-- Sélection de la classe -->
+              <div class="col-md-3 col-sm-6">
+                <label class="form-label small fw-semibold mb-1">Classe *</label>
+                <select
+                  formControlName="classe_id"
+                  class="form-select form-select-sm"
+                  (change)="onClasseChange($event)"
+                  [class.is-invalid]="f['classe_id'].touched && f['classe_id'].invalid">
+                  <option value="">Choisir une classe</option>
+                  <option *ngFor="let classe of classes" [value]="classe.id">
+                    {{ classe.nom }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Sélection de l'élève -->
+              <div class="col-md-3 col-sm-6">
+                <label class="form-label small fw-semibold mb-1">Élève *</label>
+                <select
+                  formControlName="eleve_id"
+                  class="form-select form-select-sm"
+                  [class.is-invalid]="f['eleve_id'].touched && f['eleve_id'].invalid"
+                  [disabled]="!filteredEleves.length">
+                  <option value="">Choisir un élève</option>
+                  <option *ngFor="let eleve of filteredEleves" [value]="eleve.id">
+                    {{ eleve.prenom }} {{ eleve.nom }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Date d'absence -->
+              <div class="col-md-2 col-sm-6">
+                <label class="form-label small fw-semibold mb-1">Date *</label>
+                <input
+                  type="date"
+                  formControlName="date_absence"
+                  class="form-control form-control-sm"
+                  [max]="today">
+              </div>
+
+              <!-- Motif -->
+              <div class="col-md-2 col-sm-6">
+                <label class="form-label small fw-semibold mb-1">Motif *</label>
+                <select
+                  formControlName="motif"
+                  class="form-select form-select-sm">
+                  <option *ngFor="let motif of motifsAbsence" [value]="motif.value">
+                    {{ motif.label }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Justifiée -->
+              <div class="col-md-1 col-sm-6">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="justifiee"
+                    formControlName="justifiee">
+                  <label class="form-check-label small fw-semibold" for="justifiee">
+                    Justifiée
+                  </label>
+                </div>
+              </div>
+
+              <!-- Boutons -->
+              <div class="col-md-1 col-sm-6">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-sm w-100"
+                  [disabled]="isSubmitting || absenceForm.invalid">
+                  <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-1"></span>
+                  <i class="bi bi-check2 me-1" *ngIf="!isSubmitting"></i>
+                  {{ isSubmitting ? '' : 'Valider' }}
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Commentaire - ligne séparée -->
+            <div class="row mt-2">
+              <div class="col-12">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text bg-light">
+                    <i class="bi bi-chat-text"></i>
+                  </span>
+                  <input
+                    type="text"
+                    formControlName="commentaire"
+                    class="form-control"
+                    placeholder="Commentaire optionnel...">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Marquage rapide - version compacte -->
+      <div class="card shadow-sm border-0" *ngIf="filteredEleves.length">
+        <div class="card-header bg-warning text-dark py-2 px-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-lightning me-2"></i>
+              <h6 class="mb-0 fw-bold">Marquage rapide</h6>
+            </div>
+            <small class="text-muted">{{ filteredEleves.length }} élève(s)</small>
+          </div>
+        </div>
+
+        <div class="card-body p-2">
+          <div class="row g-1">
+            <div *ngFor="let eleve of filteredEleves" class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+              <div class="border rounded p-2 bg-light h-100">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                       style="width: 24px; height: 24px; font-size: 0.7rem;">
+                    {{ eleve.prenom.charAt(0) }}{{ eleve.nom.charAt(0) }}
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="small fw-bold text-truncate">{{ eleve.prenom }} {{ eleve.nom }}</div>
+                    <div class="x-small text-muted">{{ eleve.matricule }}</div>
+                  </div>
+                </div>
+
+                <div class="btn-group w-100" role="group">
+                  <button
+                    *ngFor="let motif of motifsAbsence.slice(0, 2)"
+                    type="button"
+                    class="btn btn-outline-warning btn-xs py-1 px-2"
+                    (click)="marquerAbsenceRapide(eleve, motif.value)"
+                    [title]="motif.label">
+                    <small>{{ motif.label.substring(0, 3) }}</small>
+                  </button>
+
+                  <div class="dropdown">
+                    <button class="btn btn-outline-secondary btn-xs py-1 px-2 dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown">
+                      <small>+</small>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li *ngFor="let motif of motifsAbsence">
+                        <a class="dropdown-item small" href="javascript:void(0)"
+                           (click)="marquerAbsenceRapide(eleve, motif.value)">
+                          {{ motif.label }}
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

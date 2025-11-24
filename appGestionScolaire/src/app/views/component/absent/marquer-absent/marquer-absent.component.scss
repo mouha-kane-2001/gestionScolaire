@@ -1,0 +1,49 @@
+/* Styles personnalisés pour le formulaire d'absence */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+}
+
+.bg-gradient-warning {
+  background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+}
+
+.icon-wrapper {
+  backdrop-filter: blur(10px);
+}
+
+.form-select.border-2, .form-control.border-2 {
+  border-width: 2px !important;
+  transition: all 0.3s ease;
+}
+
+.form-select.border-2:focus, .form-control.border-2:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.avatar {
+  transition: transform 0.3s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.list-group-item {
+  transition: background-color 0.3s ease;
+}

@@ -1,0 +1,231 @@
+<div class="container-fluid py-3">
+  <div class="row justify-content-center">
+    <div class="col-12">
+
+      <!-- Carte principale compacte -->
+      <div class="card border-0 shadow-sm rounded-3 overflow-hidden user-form-card compact-form">
+
+        <!-- En-tête avec dégradé compact -->
+        <div class="card-header bg-gradient-primary text-white p-3 compact-header">
+          <div class="d-flex align-items-center">
+            <div class="form-icon-compact me-3">
+              <i class="bi" [class.bi-person-plus]="mode === 'ajout'" [class.bi-pencil]="mode === 'modif'"></i>
+            </div>
+            <div class="compact-title">
+              <h4 class="mb-1 fw-bold">
+                {{ mode === 'ajout' ? 'Créer un Utilisateur' : 'Modifier un Utilisateur' }}
+              </h4>
+              <p class="mb-0 opacity-75 small">
+                {{ mode === 'ajout' ? 'Ajoutez un nouveau membre à votre équipe' : 'Modifiez les informations de cet utilisateur' }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Corps du formulaire compact -->
+        <div class="card-body p-3 compact-body">
+          <form (ngSubmit)="soumettreFormulaire()" #userForm="ngForm" class="compact-form-grid">
+
+            <!-- Ligne 1: Prénom + Nom -->
+            <div class="row g-2 mb-2">
+              <div class="col-md-6">
+                <label for="prenom" class="form-label small fw-semibold">Prénom</label>
+                <input type="text"
+                       class="form-control form-control-sm"
+                       id="prenom"
+                       [(ngModel)]="utilisateur.prenom"
+                       name="prenom"
+                       placeholder="Entrez le prénom"
+                       required
+                         #prenomInput="ngModel">
+    <div *ngIf="prenomInput.invalid && prenomInput.touched" class="text-danger small mt-1">
+      <i class="bi bi-exclamation-circle"></i> Prénom obligatoire
+    </div>
+
+              </div>
+              <div class="col-md-6">
+                <label for="nom" class="form-label small fw-semibold">Nom</label>
+                <input type="text"
+                       class="form-control form-control-sm"
+                       id="nom"
+                       [(ngModel)]="utilisateur.nom"
+                       name="nom"
+                       placeholder="Entrez le nom"
+                       required
+                          #nomInput="ngModel">
+    <div *ngIf="nomInput.invalid && nomInput.touched" class="text-danger small mt-1">
+      <i class="bi bi-exclamation-circle"></i> Nom obligatoire
+    </div>
+              </div>
+            </div>
+
+            <!-- Ligne 2: Email + Type -->
+            <div class="row g-2 mb-2">
+              <div class="col-md-6">
+                <label for="email" class="form-label small fw-semibold">Email</label>
+                <input type="email"
+                       class="form-control form-control-sm"
+                       id="email"
+                       [(ngModel)]="utilisateur.email"
+                       name="email"
+                       placeholder="Entrez l'email"
+                       required
+                            #emailInput="ngModel">
+    <div *ngIf="emailInput.invalid && emailInput.touched" class="text-danger small mt-1">
+      <i class="bi bi-exclamation-circle"></i> Email obligatoire et valide
+    </div>
+              </div>
+              <div class="col-md-6">
+                <label for="role" class="form-label small fw-semibold">Type d'utilisateur</label>
+                <select class="form-select form-select-sm"
+                        id="role"
+                        [(ngModel)]="utilisateur.role"
+                        name="role"
+                        required
+                         #roleInput="ngModel"
+                        (change)="onTypeUtilisateurChange()">
+                  <option value="">Sélectionnez un type</option>
+                  <option value="eleve">Élève</option>
+                  <option value="prof">Professeur</option>
+                  <option value="parent">Parent</option>
+                  <option value="admin">Administrateur</option>
+                </select>
+                <div *ngIf="roleInput.invalid && roleInput.touched" class="text-danger small mt-1">
+      <i class="bi bi-exclamation-circle"></i> Type d'utilisateur obligatoire
+    </div>
+              </div>
+            </div>
+
+            <!-- Ligne 3: Mot de passe + Confirmation -->
+          <div class="row g-2 mb-2" *ngIf="mode === 'ajout'">
+  <div class="col-md-6">
+    <label for="motDePasse" class="form-label small fw-semibold">Mot de passe</label>
+    <input type="password"
+           class="form-control form-control-sm"
+           id="motDePasse"
+           [(ngModel)]="motDePasse"
+           name="motDePasse"
+           placeholder="Entrez le mot de passe"
+           required
+           minlength="8"
+           #motDePasseInput="ngModel">
+
+    <div *ngIf="motDePasseInput.invalid && motDePasseInput.touched" class="text-danger small mt-1">
+      <i class="bi bi-exclamation-circle"></i>
+      <span *ngIf="motDePasseInput.errors?.['required']">Mot de passe obligatoire</span>
+      <span *ngIf="motDePasseInput.errors?.['minlength']">Minimum 8 caractères</span>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <label for="confirmerMotDePasse" class="form-label small fw-semibold">Confirmation</label>
+    <input type="password"
+           class="form-control form-control-sm"
+           id="confirmerMotDePasse"
+           [(ngModel)]="confirmerMotDePasse"
+           name="confirmerMotDePasse"
+           placeholder="Confirmez le mot de passe"
+           required
+           #confirmerMotDePasseInput="ngModel">
+
+    <div *ngIf="confirmerMotDePasseInput.invalid && confirmerMotDePasseInput.touched" class="text-danger small mt-1">
+      <i class="bi bi-exclamation-circle"></i> Confirmation obligatoire
+    </div>
+
+    <!-- Message d'erreur pour mots de passe non identiques -->
+    <div *ngIf="motDePasse !== confirmerMotDePasse && confirmerMotDePasse" class="text-danger small mt-1">
+      <i class="bi bi-exclamation-circle"></i> Les mots de passe ne correspondent pas
+    </div>
+  </div>
+</div>
+
+            <!-- Champs spécifiques selon le type -->
+
+            <!-- POUR ÉLÈVE -->
+            <div class="row g-2 mb-2" *ngIf="utilisateur.role === 'eleve'">
+              <div class="col-12">
+                <label for="classe" class="form-label small fw-semibold">Classe</label>
+                <select class="form-select form-select-sm"
+                        [(ngModel)]="utilisateur.classe_id"
+                        name="classe_id">
+                  <option value="">Sélectionnez une classe</option>
+                  <option *ngFor="let classe of classes" [value]="classe.id">
+                    {{ classe.nom }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- POUR PROFESSEUR -->
+            <div class="row g-2 mb-2" *ngIf="utilisateur.role === 'prof'">
+              <div class="col-12">
+                <label for="matiere" class="form-label small fw-semibold">Matière</label>
+                <select class="form-select form-select-sm"
+                        [(ngModel)]="utilisateur.matiere_id"
+                        name="matiere_id">
+                  <option value="">Sélectionnez une matière</option>
+                  <option *ngFor="let matiere of matieres" [value]="matiere.id">
+                    {{ matiere.nom }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- POUR PARENT -->
+            <div *ngIf="utilisateur.role === 'parent'">
+              <div class="row g-2 mb-2">
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Téléphone</label>
+                  <input type="text"
+                         class="form-control form-control-sm"
+                         [(ngModel)]="utilisateur.telephone"
+                         name="telephone"
+                         placeholder="Téléphone">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Rechercher élèves</label>
+                  <input type="text"
+                         class="form-control form-control-sm"
+                         [(ngModel)]="searchQuery"
+                         [ngModelOptions]="{standalone: true}"
+                         (input)="filterEleves()"
+                         placeholder="Matricule ou nom...">
+                </div>
+              </div>
+
+              <div class="compact-eleves-list" *ngIf="filteredEleves.length > 0">
+                <label class="form-label small fw-semibold">Élèves associés</label>
+                <div class="compact-checkbox-grid">
+                  <div *ngFor="let eleve of filteredEleves" class="compact-checkbox-item">
+                    <div class="form-check">
+                      <input class="form-check-input"
+                             type="checkbox"
+                             [id]="'eleve_' + eleve.id"
+                             [checked]="utilisateur.elevesIds.includes(eleve.id)"
+                             (change)="$event.target.checked ? addEleve(eleve) : removeEleve(eleve.id)">
+                      <label class="form-check-label small" [for]="'eleve_' + eleve.id">
+                        {{ eleve.matricule }} - {{ eleve.prenom }} {{ eleve.nom }}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bouton de soumission -->
+            <div class="d-grid mt-3">
+              <button type="submit"
+                      class="btn btn-primary btn-sm py-2 fw-semibold"
+                      [disabled]="!userForm.form.valid">
+                <i class="bi" [class.bi-person-plus]="mode === 'ajout'" [class.bi-check]="mode === 'modif'"></i>
+                {{ mode === 'ajout' ? 'Créer l\'utilisateur' : 'Modifier l\'utilisateur' }}
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

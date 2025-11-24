@@ -1,0 +1,136 @@
+<div class="dashboard-prof">
+  <!-- En-tête avec stats rapides -->
+  <div class="dashboard-header mb-5">
+    <div class="header-content">
+      <h1 class="dashboard-title">Tableau de Bord</h1>
+      <p class="dashboard-subtitle">Vue d'ensemble de vos classes et activités</p>
+    </div>
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="cil-school"></i>
+        </div>
+        <div class="stat-content">
+          <span class="number">{{ classes.length }}</span>
+          <span class="label">Classes</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="cil-user"></i>
+        </div>
+        <div class="stat-content">
+          <span class="number">{{ getTotalEleves() }}</span>
+          <span class="label">Élèves</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="cil-warning"></i>
+        </div>
+        <div class="stat-content">
+          <span class="number">{{ getTotalAbsences() }}</span>
+          <span class="label">Absences</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner">
+      <div class="spinner-circle"></div>
+    </div>
+    <p class="loading-text">Chargement des données...</p>
+  </div>
+
+  <!-- Contenu principal -->
+  <div *ngIf="!isLoading" class="dashboard-content">
+    <!-- Mes classes -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Mes classes</h2>
+        <button class="btn-primary" routerLink="/prof/classes">
+          Voir toutes les classes
+        </button>
+      </div>
+      <div class="section-body">
+        <div class="classes-grid">
+          <div *ngFor="let classe of classes" class="class-card">
+            <div class="class-header">
+              <h3 class="class-name">{{ classe.nom }}</h3>
+            </div>
+            <div class="class-stats">
+              <div class="class-stat">
+                <span class="stat-value">{{ classe.nombreEleves }}</span>
+                <span class="stat-label">Élèves</span>
+              </div>
+              <div class="class-stat">
+                <span class="stat-value">{{ classe.absences }}</span>
+                <span class="stat-label">Absences</span>
+              </div>
+            </div>
+            <button class="btn-outline class-action" [routerLink]="['/prof/classe', classe.id]">
+              Voir détails
+            </button>
+          </div>
+        </div>
+        <div *ngIf="classes.length === 0" class="empty-state">
+          <div class="empty-icon">
+            <i class="cil-school"></i>
+          </div>
+          <p class="empty-text">Aucune classe assignée</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-columns">
+      <!-- Graphique des absences -->
+      <div class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">Absences par classe</h2>
+        </div>
+        <div class="section-body">
+          <div *ngIf="classes.length > 0" class="chart-container">
+            <c-chart type="bar" [data]="chartData.absences" [options]="chartOptions.absences"></c-chart>
+          </div>
+          <div *ngIf="classes.length === 0" class="empty-state">
+            <p>Aucune donnée à afficher</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Derniers messages -->
+      <div class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">Derniers messages</h2>
+          <button class="btn-outline" routerLink="/prof/messages">
+            Voir tous
+          </button>
+        </div>
+        <div class="section-body">
+          <div class="messages-list">
+            <div *ngFor="let message of messagesRecus" class="message-item">
+              <div class="message-header">
+                <div class="sender-info">
+                  <div class="sender-avatar">
+                    {{ message.expediteur.charAt(0) }}
+                  </div>
+                  <strong class="sender-name">{{ message.expediteur }}</strong>
+                </div>
+                <span class="message-date">{{ formatDate(message.date) }}</span>
+              </div>
+              <div class="message-content">{{ message.message }}</div>
+            </div>
+          </div>
+          <div *ngIf="messagesRecus.length === 0" class="empty-state">
+            <div class="empty-icon">
+              <i class="cil-envelope-open"></i>
+            </div>
+            <p class="empty-text">Aucun message</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

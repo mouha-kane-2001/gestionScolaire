@@ -1,0 +1,165 @@
+<ng-container>
+    <header cHeader class="header-container custom-header">
+    <div class="header-content">
+            <nav class="header-nav main-nav">
+                 <div class="nav-item">
+          <a class="nav-link" routerLink="/users" routerLinkActive="active">
+            <i class="bi bi-people"></i>
+            Utilisateurs
+          </a>
+        </div>
+        <div class="nav-item">
+          <a class="nav-link" routerLink="/affectation" routerLinkActive="active">
+            <i class="bi bi-diagram-3"></i>
+            Attribuer classe
+          </a>
+        </div>
+        <div class="nav-item">
+          <a class="nav-link" routerLink="/convocations/envoie" routerLinkActive="active">
+            <i class="bi bi-megaphone"></i>
+            Convocation
+          </a>
+        </div>
+        <div class="nav-item">
+          <a class="nav-link" routerLink="/messages/admin" routerLinkActive="active">
+            <i class="bi bi-chat-dots"></i>
+            Messages
+          </a>
+        </div>
+        <div class="nav-item">
+          <a class="nav-link" routerLink="/settings" routerLinkActive="active">
+            <i class="bi bi-gear"></i>
+            Settings
+          </a>
+        </div>
+      </nav>
+
+      <nav class="header-nav icon-nav">
+        <a class="nav-link">
+          <i class="bi bi-bell"></i>
+        </a>
+
+        <a class="nav-link">
+          <i class="bi bi-envelope"></i>
+        </a>
+      </nav>
+
+      <nav class="header-nav utils-nav">
+        <div class="nav-divider"></div>
+
+        <!-- Theme dropdown -->
+        <div class="dropdown theme-dropdown">
+          <button class="dropdown-toggle" aria-label="Open theme picker">
+            <i class="bi bi-palette"></i>
+          </button>
+          <div class="dropdown-menu">
+            <!-- Les options de thème seraient générées dynamiquement -->
+          </div>
+        </div>
+
+        <div class="nav-divider"></div>
+      </nav>
+
+      <!-- User dropdown -->
+      <nav class="header-nav user-nav" style="margin-left: auto;">
+        <div class="dropdown user-dropdown">
+          <button class="dropdown-toggle user-toggle" aria-label="Open user menu">
+            <div class="user-avatar">
+              <img src="./assets/images/avatars/8.jpg" alt="User avatar">
+              <span class="status-indicator"></span>
+            </div>
+          </button>
+          <ul class="dropdown-menu user-menu">
+            <li>
+              <h6 class="dropdown-header">Account</h6>
+            </li>
+            <li>
+              <a class="dropdown-item">
+                <i class="bi bi-bell"></i>
+                Updates
+                <span class="badge badge-info">42</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item">
+                <i class="bi bi-envelope"></i>
+                Messages
+                <span class="badge badge-success">42</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item">
+                <i class="bi bi-check-square"></i>
+                Tasks
+                <span class="badge badge-danger">42</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item">
+                <i class="bi bi-chat"></i>
+                Comments
+                <span class="badge badge-warning">42</span>
+              </a>
+            </li>
+            <li>
+              <h6 class="dropdown-header">Settings</h6>
+            </li>
+            <li>
+              <a class="dropdown-item">
+                <i class="bi bi-person"></i>
+                Profile
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item">
+                <i class="bi bi-gear"></i>
+                Settings
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item">
+                <i class="bi bi-credit-card"></i>
+                Payments
+                <span class="badge badge-secondary">42</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item">
+                <i class="bi bi-folder"></i>
+                Projects
+                <span class="badge badge-primary">42</span>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item">
+                <i class="bi bi-lock"></i>
+                Lock Account
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" (click)="seDeconnecter()">
+                <i class="bi bi-box-arrow-right"></i>
+                Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <div class="breadcrumb-container">
+      <!-- Breadcrumb serait généré dynamiquement -->
+      <nav class="breadcrumb">
+        <a class="breadcrumb-item" routerLink="/dashboard">
+          <i class="bi bi-house"></i>
+          Home
+        </a>
+        <a class="breadcrumb-item" routerLink="/dashboard">
+          <i class="bi bi-speedometer2"></i>
+          Dashboard
+        </a>
+      </nav>
+    </div>
+</header>
+</ng-container>

@@ -1,0 +1,226 @@
+/* Palette douce, moderne */
+:root {
+  --primary: #8b5cf6;
+  --primary-light: #f5f0ff;
+  --success: #10b981;
+  --danger: #ef4444;
+  --gray-100: #f3f3f3;
+  --gray-200: #e5e5e5;
+  --gray-300: #d1d1d1;
+  --gray-500: #777;
+  --radius: 10px;
+}
+
+/* Conteneur général */
+.convocation-container {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+  padding-bottom: 2rem;
+}
+
+/* HEADER */
+.compact-header {
+  display: flex;
+  align-items: center;
+  padding: 1.7rem 2.2rem;
+  gap: 1rem;
+  background: linear-gradient(135deg, #807e82, #ffffff);
+  color: white;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.header-icon {
+  width: 55px;
+  height: 55px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+/* CARD formulaire */
+.compact-form-card {
+  padding: 1.8rem;
+}
+
+/* Section douce */
+.form-section.compact {
+  background: var(--gray-100);
+  padding: 1.3rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--gray-200);
+}
+
+/* Label section */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-weight: 600;
+  margin-bottom: .7rem;
+  color: #444;
+}
+
+/* RADIO CARDS */
+.radio-cards.compact {
+  display: flex;
+  gap: .8rem;
+}
+
+.radio-card.compact {
+  flex: 1;
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-300);
+  padding: .9rem;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.radio-card.compact.active {
+  border-color: var(--success);
+  background: #ecfdf5;
+}
+
+.radio-card.compact .card-content {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+/* FORM-ROW */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px,1fr));
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+/* INPUT GROUP */
+.form-group.compact {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: .9rem;
+  color: #444;
+}
+
+/* SELECT */
+.select-wrapper {
+  position: relative;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius);
+  background: white;
+}
+
+.compact-select {
+  width: 100%;
+  padding: .65rem .9rem;
+  border: none;
+  background: transparent;
+}
+
+/* INPUT */
+.compact-input, .compact-textarea {
+  width: 100%;
+  padding: .7rem .9rem;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius);
+  transition: .25s;
+}
+
+.compact-input:focus,
+.compact-textarea:focus,
+.select-wrapper:focus-within {
+  border-color: var(-- success);
+  box-shadow: 0 0 0 3px rgba(116, 149, 106, 0.15);
+  outline: none;
+}
+
+/* TEXTAREA */
+.compact-textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+/* ERROR */
+.error-message {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  padding: .4rem .6rem;
+  border-radius: 5px;
+  color: var(--danger);
+  font-size: .78rem;
+}
+
+/* FOOTER compteur */
+.input-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: .4rem;
+}
+
+.character-count {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-300);
+  padding: .3rem .5rem;
+  border-radius: 5px;
+  font-size: .75rem;
+}
+
+/* BOUTONS */
+.form-actions.compact {
+  display: flex;
+  justify-content: flex-end;
+  gap: .7rem;
+  margin-top: 1rem;
+  padding-top:1rem;
+  border-top: 1px solid var(--gray-200);
+}
+
+.btn {
+  padding: .75rem 1.25rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: .25s;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #6d28d9;
+}
+
+.btn-secondary {
+  background: var(--gray-200);
+}
+
+.btn-secondary:hover {
+  background: var(--gray-300);
+}
+
+
+
+input {
+  border: 2px solid #e1d9d9 !important;   // 👉 Border visible même sans focus
+  border-radius: 8px;                  // optionnel (design)
+}
+
+
+textarea {
+  border: 2px solid #ece9e9 !important;   // 👉 Border visible même sans focus
+  border-radius: 8px;                  // optionnel (design)
+}

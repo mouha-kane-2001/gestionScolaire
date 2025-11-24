@@ -17,7 +17,7 @@ pipeline {
         ------------------------------ */
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/TON_USER/TON_REPO.git'
+                git branch: 'main', url: 'https://github.com/mouha-kane-2001/gestionScolaire.git'
             }
         }
 

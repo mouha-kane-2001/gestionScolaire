@@ -1,0 +1,82 @@
+<ng-container>
+    <header cHeader class="header-container custom-header">
+    <div class="header-content">
+            <nav class="header-nav main-nav">
+        <div class="nav-item">
+          <a class="nav-link" routerLink="/prof/dashboard" routerLinkActive="active">
+            <i class="bi bi-speedometer2"></i>
+            Dashboard
+          </a>
+        </div>
+        <div class="nav-item">
+          <a class="nav-link" routerLink="/prof/messages/prof" routerLinkActive="active">
+            <i class="bi bi-chat-dots"></i>
+            Messages
+          </a>
+        </div>
+        <div class="nav-item">
+          <a class="nav-link" routerLink="/prof/notes/attribue" routerLinkActive="active">
+            <i class="bi bi-pencil-square"></i>
+            Saisir Note
+          </a>
+        </div>
+        <div class="nav-item">
+          <a class="nav-link" routerLink="/prof/absences/listePresence" routerLinkActive="active">
+            <i class="bi bi-person-x"></i>
+            Absences
+          </a>
+        </div>
+        <div class="nav-item">
+          <a class="nav-link" routerLink="/settings" routerLinkActive="active">
+            <i class="bi bi-gear"></i>
+            Settings
+          </a>
+        </div>
+      </nav>
+
+      <nav class="header-nav icon-nav">
+        <a class="nav-link">
+          <i class="bi bi-bell"></i>
+        </a>
+        <a class="nav-link">
+          <i class="bi bi-list"></i>
+        </a>
+        <a class="nav-link">
+          <i class="bi bi-envelope"></i>
+        </a>
+      </nav>
+
+      <nav class="header-nav utils-nav">
+        <div class="nav-divider"></div>
+
+        <!-- Theme dropdown -->
+        <div class="dropdown theme-dropdown">
+          <button class="dropdown-toggle" aria-label="Open theme picker">
+            <i class="bi bi-palette"></i>
+          </button>
+          <div class="dropdown-menu">
+            <!-- Les options de thème seraient générées dynamiquement -->
+          </div>
+        </div>
+
+        <div class="nav-divider"></div>
+      </nav>
+
+    </div>
+
+    <div class="breadcrumb-container">
+      <!-- Breadcrumb serait généré dynamiquement -->
+      <nav class="breadcrumb">
+        <a class="breadcrumb-item" routerLink="/dashboard">
+          <i class="bi bi-house"></i>
+          Home
+        </a>
+        <a class="breadcrumb-item" routerLink="/dashboard">
+          <i class="bi bi-speedometer2"></i>
+          Dashboard
+        </a>
+      </nav>
+    </div>
+
+</header>
+</ng-container>

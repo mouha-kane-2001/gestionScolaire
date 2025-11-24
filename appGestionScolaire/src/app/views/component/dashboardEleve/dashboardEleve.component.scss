@@ -1,0 +1,232 @@
+.dashboard-eleve {
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+// En-tête
+.student-header {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 2rem;
+  border-left: 4px solid #007bff;
+}
+
+// Cartes de statistiques
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .stat-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.8;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-subtext {
+    color: #adb5bd;
+    font-size: 0.8rem;
+  }
+}
+
+// Couleurs des icônes de stats
+.stat-card-1 .stat-icon { color: #007bff; }
+.stat-card-2 .stat-icon { color: #28a745; }
+.stat-card-3 .stat-icon { color: #ffc107; }
+.stat-card-4 .stat-icon { color: #6f42c1; }
+
+// Cartes principales
+.custom-card {
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+
+  .card-header-custom {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+
+    h5 {
+      margin: 0;
+      font-weight: 600;
+    }
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+// Items de liste
+.note-item, .absence-item, .message-item, .convocation-item, .matiere-item {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  border: 1px solid #f8f9fa;
+  transition: all 0.2s ease;
+  background: white;
+
+  &:hover {
+    border-color: #e9ecef;
+    background: #f8f9fa;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Badges améliorés
+.badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+
+  &.note-type-badge {
+    background: #e9ecef;
+    color: #495057;
+    border: 1px solid #dee2e6;
+  }
+}
+
+// Notes avec indicateurs de couleur subtils
+.note-value {
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+
+  &.text-success {
+    background: rgba(40, 167, 69, 0.1);
+    border-color: rgba(40, 167, 69, 0.2);
+  }
+  &.text-primary {
+    background: rgba(0, 123, 255, 0.1);
+    border-color: rgba(0, 123, 255, 0.2);
+  }
+  &.text-warning {
+    background: rgba(255, 193, 7, 0.1);
+    border-color: rgba(255, 193, 7, 0.2);
+  }
+  &.text-danger {
+    background: rgba(220, 53, 69, 0.1);
+    border-color: rgba(220, 53, 69, 0.2);
+  }
+}
+
+// Évolution des matières
+.evolution {
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.8rem;
+
+  &.positive {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.2);
+  }
+
+  &.negative {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+  }
+}
+
+// Messages
+.message-expediteur {
+  color: #2c3e50;
+}
+
+// Convocations
+.convocation-item {
+  background: rgba(255, 193, 7, 0.05);
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+// États vides
+.text-center.text-muted {
+  padding: 2rem 1rem;
+
+  .display-4 {
+    opacity: 0.5;
+    margin-bottom: 1rem;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .dashboard-eleve {
+    padding: 1rem;
+  }
+
+  .student-header {
+    padding: 1rem;
+    text-align: center;
+
+    .d-flex {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+
+  .stat-card {
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+
+  .custom-card {
+    .card-body {
+      padding: 1rem;
+    }
+  }
+}
+
+// Animations subtiles
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-card, .custom-card {
+  animation: fadeIn 0.4s ease-out;
+}

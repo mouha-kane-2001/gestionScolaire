@@ -1,0 +1,46 @@
+.dashboard-parent {
+  padding: 1rem;
+
+  .card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+
+    .card-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    }
+  }
+
+  .avatar-sm {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+  }
+
+  .border-bottom {
+    border-bottom: 1px solid #dee2e6 !important;
+  }
+
+  // Styles pour les badges
+  .badge {
+    font-size: 0.75em;
+  }
+
+  // Animation pour les cartes
+  .card {
+    transition: transform 0.2s ease-in-out;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+
+    .fs-4 {
+      font-size: 1.5rem !important;
+    }
+  }
+}

@@ -1,0 +1,90 @@
+<div class="notifications-container">
+  <!-- En-tête -->
+  <div class="notifications-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <h5 class="notifications-title">
+        <i class="bi bi-bell me-2"></i>
+        Notifications
+      </h5>
+      <div class="notification-actions">
+        <span class="badge bg-primary rounded-pill me-2">{{ nbNonLues }} non lues</span>
+        <button class="btn btn-sm mark-all-read-btn" (click)="marquerToutesCommeLues()">
+          <i class="bi bi-check-all me-1"></i>
+          Tout lire
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="notifications-filters">
+    <div class="filter-buttons">
+      <button
+        class="filter-btn"
+        [class.active]="filtreType === 'toutes'"
+        (click)="changerFiltreType('toutes')"
+      >
+        <i class="bi bi-funnel me-1"></i>
+        Toutes
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="filtreType === 'recues'"
+        (click)="changerFiltreType('recues')"
+      >
+        <i class="bi bi-inbox me-1"></i>
+        Reçues
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="filtreType === 'envoyees'"
+        (click)="changerFiltreType('envoyees')"
+      >
+        <i class="bi bi-send me-1"></i>
+        Envoyées
+      </button>
+    </div>
+  </div>
+
+  <!-- Liste des notifications -->
+  <div class="notifications-list">
+    <div *ngFor="let notif of filteredNotifications"
+         class="notification-item"
+         [class.unread]="notif.statut === 'non_lu'">
+
+      <div class="notification-icon">
+        <i class="{{ getNotificationIcon(notif.type) }}"></i>
+      </div>
+
+      <div class="notification-content">
+        <div class="notification-header">
+          <span class="notification-type">{{ getTypeLabel(notif.type) }}</span>
+          <span class="notification-time">{{ formatDate(notif.created_at) }}</span>
+        </div>
+
+        <div class="notification-text" *ngIf="notif.texte">
+          {{ notif.texte }}
+        </div>
+
+        <div class="notification-footer">
+          <span class="notification-status"
+                [class.unread-status]="notif.statut === 'non_lu'"
+                [class.read-status]="notif.statut === 'lu'">
+            {{ notif.statut === 'non_lu' ? 'Non lue' : 'Lue' }}
+          </span>
+
+          <button class="view-btn" (click)="handleNotificationClick(notif)">
+            <i class="bi bi-arrow-right me-1"></i>
+            Voir
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- État vide -->
+    <div *ngIf="filteredNotifications.length === 0" class="empty-state">
+      <i class="bi bi-bell-slash"></i>
+      <p>Aucune notification</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,274 @@
+<div class="dashboard-admin">
+  <!-- En-tête -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Tableau de Bord Administrateur</h1>
+    <div class="d-flex gap-2">
+             <button cButton color="success" routerLink="/users">
+        <i class="bi bi-people-fill"></i> Gérer Utilisateurs
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Cartes de statistiques globales -->
+  <c-row class="mb-4">
+    <c-col xs="12" sm="6" lg="3">
+      <c-card class="mb-4">
+        <c-card-body class="text-center">
+          <div class="text-primary mb-3">
+            <i class="cil-user" style="font-size: 2rem;"></i>
+          </div>
+          <div class="fs-4 fw-bold">{{ stats.totalUtilisateurs }}</div>
+          <div class="text-medium-emphasis">Utilisateurs</div>
+        </c-card-body>
+        <c-card-footer class="text-center">
+          <small class="text-muted">
+            {{ stats.professeurs }} Profs • {{ stats.eleves }} Élèves • {{ stats.parents }} Parents
+          </small>
+        </c-card-footer>
+      </c-card>
+    </c-col>
+
+    <c-col xs="12" sm="6" lg="3">
+      <c-card class="mb-4">
+        <c-card-body class="text-center">
+          <div class="text-warning mb-3">
+            <i class="cil-school" style="font-size: 2rem;"></i>
+          </div>
+          <div class="fs-4 fw-bold">{{ stats.totalClasses }}</div>
+          <div class="text-medium-emphasis">Classes</div>
+        </c-card-body>
+        <c-card-footer class="text-center">
+          <small class="text-muted">{{ stats.totalClasses }} actives</small>
+        </c-card-footer>
+      </c-card>
+    </c-col>
+
+    <c-col xs="12" sm="6" lg="3">
+      <c-card class="mb-4">
+        <c-card-body class="text-center">
+          <div class="text-danger mb-3">
+            <i class="cil-warning" style="font-size: 2rem;"></i>
+          </div>
+          <div class="fs-4 fw-bold">{{ stats.absencesTotal }}</div>
+          <div class="text-medium-emphasis">Absences cette semaine</div>
+        </c-card-body>
+        <c-card-footer class="text-center">
+          <small class="text-muted">{{ stats.absencesNonJustifiees }} non justifiées</small>
+        </c-card-footer>
+      </c-card>
+    </c-col>
+
+    <c-col xs="12" sm="6" lg="3">
+      <c-card class="mb-4">
+        <c-card-body class="text-center">
+          <div class="text-success mb-3">
+            <i class="cil-calendar" style="font-size: 2rem;"></i>
+          </div>
+          <div class="fs-4 fw-bold">{{ stats.convocationsEnCours }}</div>
+          <div class="text-medium-emphasis">Convocations non lu</div>
+        </c-card-body>
+        <c-card-footer class="text-center">
+          <small class="text-muted">{{ stats.convocationsCetteSemaine }} cette semaine</small>
+        </c-card-footer>
+      </c-card>
+    </c-col>
+  </c-row>
+
+  <!-- Deuxième ligne de statistiques -->
+  <c-row class="mb-4">
+    <c-col xs="12" sm="6" lg="3">
+      <c-card class="mb-4">
+        <c-card-body class="text-center">
+          <div class="text-info mb-3">
+            <i class="cil-clipboard" style="font-size: 2rem;"></i>
+          </div>
+          <div class="fs-4 fw-bold">{{ stats.notesSaisies }}</div>
+          <div class="text-medium-emphasis">Notes saisies</div>
+        </c-card-body>
+        <c-card-footer class="text-center">
+          <small class="text-muted">7 derniers jours</small>
+        </c-card-footer>
+      </c-card>
+    </c-col>
+
+    <c-col xs="12" sm="6" lg="3">
+      <c-card class="mb-4">
+        <c-card-body class="text-center">
+          <div class="text-secondary mb-3">
+            <i class="cil-envelope-open" style="font-size: 2rem;"></i>
+          </div>
+          <div class="fs-4 fw-bold">{{ stats.messagesNonLus }}</div>
+          <div class="text-medium-emphasis">Messages non lus</div>
+        </c-card-body>
+        <c-card-footer class="text-center">
+          <small class="text-muted">Dans le système</small>
+        </c-card-footer>
+      </c-card>
+    </c-col>
+
+    <c-col xs="12" sm="6" lg="3">
+      <c-card class="mb-4">
+        <c-card-body class="text-center">
+          <div class="text-warning mb-3">
+            <i class="cil-bell" style="font-size: 2rem;"></i>
+          </div>
+          <div class="fs-4 fw-bold">{{ stats.alertesActives }}</div>
+          <div class="text-medium-emphasis">Alertes actives</div>
+        </c-card-body>
+        <c-card-footer class="text-center">
+          <small class="text-muted">Nécessitent attention</small>
+        </c-card-footer>
+      </c-card>
+    </c-col>
+
+    <c-col xs="12" sm="6" lg="3">
+      <c-card class="mb-4">
+        <c-card-body class="text-center">
+          <div class="text-success mb-3">
+            <i class="cil-chart" style="font-size: 2rem;"></i>
+          </div>
+          <div class="fs-4 fw-bold">{{ stats.moyenneGenerale | number:'1.1-1' }}/20</div>
+          <div class="text-medium-emphasis">Moyenne générale</div>
+        </c-card-body>
+        <c-card-footer class="text-center">
+          <small class="text-muted">Tous établissements</small>
+        </c-card-footer>
+      </c-card>
+    </c-col>
+  </c-row>
+
+  <!-- Contenu principal -->
+  <c-row>
+    <!-- Colonne de gauche - Graphiques et activités -->
+    <c-col lg="8">
+      <!-- Graphiques principaux -->
+      <c-row class="mb-4">
+        <c-col lg="6">
+          <c-card class="mb-4">
+            <c-card-header>
+              <h6 class="card-title mb-0">Activité des utilisateurs</h6>
+            </c-card-header>
+            <c-card-body>
+              <div style="height: 250px;">
+                <c-chart type="line" [data]="chartData.activite" [options]="chartOptions.activite"></c-chart>
+              </div>
+            </c-card-body>
+          </c-card>
+        </c-col>
+        <c-col lg="6">
+          <c-card class="mb-4">
+            <c-card-header>
+              <h6 class="card-title mb-0">Répartition des utilisateurs</h6>
+            </c-card-header>
+            <c-card-body>
+              <div style="height: 250px;">
+                <c-chart type="doughnut" [data]="chartData.repartition" [options]="chartOptions.repartition"></c-chart>
+              </div>
+            </c-card-body>
+          </c-card>
+        </c-col>
+      </c-row>
+
+      <!-- Statistiques détaillées -->
+      <c-row>
+        <c-col lg="6">
+          <c-card class="mb-4">
+            <c-card-header>
+              <h6 class="card-title mb-0">Performances par classe</h6>
+            </c-card-header>
+            <c-card-body>
+              <div style="height: 250px;">
+                <c-chart type="bar" [data]="chartData.performance" [options]="chartOptions.performance"></c-chart>
+              </div>
+            </c-card-body>
+          </c-card>
+        </c-col>
+        <c-col lg="6">
+          <c-card class="mb-4">
+            <c-card-header>
+              <h6 class="card-title mb-0">Taux d'absentéisme</h6>
+            </c-card-header>
+            <c-card-body>
+              <div style="height: 250px;">
+                <c-chart type="polarArea" [data]="chartData.absences" [options]="chartOptions.absences"></c-chart>
+              </div>
+            </c-card-body>
+          </c-card>
+        </c-col>
+      </c-row>
+
+
+    </c-col>
+
+    <!-- Colonne de droite - Alertes, utilisateurs, actions rapides -->
+    <c-col lg="4">
+      <!-- Alertes urgentes -->
+      <c-card class="mb-4">
+        <c-card-header class="bg-warning text-white">
+          <h6 class="card-title mb-0">Messages  urgentes</h6>
+        </c-card-header>
+        <c-card-body>
+          <div *ngFor="let alerte of alertesUrgentes" class="border-bottom pb-2 mb-2">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <strong class="text-danger">{{ alerte.titre }}</strong>
+                <div class="text-muted small">{{ alerte.description }}</div>
+                <div class="small">{{ formatDateTime(alerte.date) }}</div>
+              </div>
+              <span [ngClass]="'badge ' + getAlerteBadgeClass(alerte.niveau)">
+                {{ alerte.niveau }}
+              </span>
+            </div>
+          </div>
+          <div *ngIf="alertesUrgentes.length === 0" class="text-center text-muted py-3">
+            Aucune alerte urgente
+          </div>
+        </c-card-body>
+        <c-card-footer>
+          <button cButton color="outline-warning" size="sm" class="w-100" routerLink="/messages/admin">
+            Gérer les messages
+          </button>
+        </c-card-footer>
+      </c-card>
+
+      <!-- Utilisateurs récents -->
+      <c-card class="mb-4">
+        <c-card-header>
+          <h6 class="card-title mb-0">Utilisateurs récemment ajoutés</h6>
+        </c-card-header>
+        <c-card-body>
+          <div *ngFor="let utilisateur of utilisateursRecents" class="border-bottom pb-2 mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <strong>{{ utilisateur.prenom }} {{ utilisateur.nom }}</strong>
+                <div class="text-muted small">{{ utilisateur.email }}</div>
+                <div class="small">
+                  <span [ngClass]="'badge ' + getRoleBadgeClass(utilisateur.role)">
+                    {{ utilisateur.role }}
+                  </span>
+                </div>
+              </div>
+              <div class="text-end">
+                <div class="small text-muted">{{ formatDate(utilisateur.dateCreation) }}</div>
+                <button cButton color="outline-primary" size="sm" (click)="editUser(utilisateur.id)">
+                  <i class="cil-pencil"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="utilisateursRecents.length === 0" class="text-center text-muted py-3">
+            Aucun utilisateur récent
+          </div>
+        </c-card-body>
+        <c-card-footer>
+          <button cButton color="outline-primary" size="sm" class="w-100" routerLink="/users">
+            Gérer tous les utilisateurs
+          </button>
+        </c-card-footer>
+      </c-card>
+
+
+    </c-col>
+  </c-row>
+</div>

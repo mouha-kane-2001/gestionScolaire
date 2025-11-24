@@ -1,0 +1,267 @@
+// Variables pour les couleurs
+$sidebar-gradient-start: #667eea;
+$sidebar-gradient-end: #764ba2;
+$sidebar-hover-color: rgba(255, 255, 255, 0.1);
+$sidebar-active-color: rgba(255, 255, 255, 0.2);
+$sidebar-text-color: rgba(255, 255, 255, 0.9);
+$sidebar-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+
+// Sidebar principal
+.sidebar-modern {
+  background: linear-gradient(135deg, #aacce1 55%, #ffffff 20%,rgb(180, 210, 215)) !important;
+  box-shadow: $sidebar-shadow;
+  border: none !important;
+
+  // Animation de transition
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+  }
+}
+
+// Header de la sidebar
+.sidebar-header-custom {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 1rem 1rem;
+  background: rgba(0, 0, 0, 0.1);
+
+  .brand-custom {
+    text-decoration: none;
+    color: white;
+
+    .brand-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      img {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+
+      .brand-text {
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+    }
+  }
+}
+
+// Scrollbar personnalisé
+.sidebar-scrollbar {
+  .ng-scrollbar {
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.5);
+      }
+    }
+  }
+}
+
+// Navigation items personnalisés
+.sidebar-nav-custom {
+
+  .c-sidebar-nav {
+    padding: 1rem 0.5rem;
+
+    .c-sidebar-nav-item {
+      margin-bottom: 4px;
+
+      .c-sidebar-nav-link {
+        color: rgb(58, 57, 57);
+        border-radius: 12px;
+        margin: 2px 8px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+        border: none;
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          height: 100%;
+          width: 4px;
+          background: rgba(255, 255, 255, 0.5);
+          transform: scaleY(0);
+          transition: transform 0.3s ease;
+        }
+
+        &:hover {
+          background: $sidebar-hover-color !important;
+          transform: translateX(5px);
+          color: white !important;
+
+          &::before {
+            transform: scaleY(1);
+          }
+
+          .c-sidebar-nav-icon {
+            transform: scale(1.1);
+          }
+        }
+
+        &.c-active {
+          background: $sidebar-active-color !important;
+          color: white !important;
+          font-weight: 600;
+
+          &::before {
+            transform: scaleY(1);
+            background: white;
+          }
+        }
+
+        .c-sidebar-nav-icon {
+          margin-right: 12px;
+          transition: transform 0.3s ease;
+          font-size: 1.1rem;
+        }
+
+        .c-sidebar-nav-title {
+          font-weight: 500;
+          transition: all 0.3s ease;
+        }
+      }
+
+      // Sous-menus
+      .c-sidebar-nav-dropdown {
+        .c-sidebar-nav-dropdown-items {
+          background: rgba(0, 0, 0, 0.1);
+          border-radius: 8px;
+          margin: 8px 0;
+          padding: 4px 0;
+
+          .c-sidebar-nav-link {
+            margin: 2px 12px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+
+            &:hover {
+              transform: translateX(3px);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Footer de la sidebar
+.sidebar-footer-custom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.1);
+
+  .sidebar-toggler-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 8px;
+    color: $sidebar-text-color;
+    padding: 10px 16px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .toggle-icon {
+      width: 16px;
+      height: 16px;
+      border: 2px solid currentColor;
+      border-top: none;
+      border-right: none;
+      transform: rotate(45deg);
+      transition: transform 0.3s ease;
+    }
+
+    .toggle-text {
+      font-weight: 500;
+    }
+  }
+}
+
+
+
+// Responsive
+@media (max-width: 992px) {
+  .sidebar-modern {
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+  }
+}
+
+// Animation pour le sidebar réduit
+.sidebar-modern:not(.c-sidebar-unfoldable) {
+  .brand-text {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  &.c-sidebar-narrow {
+    .brand-text {
+      opacity: 0;
+    }
+
+    .sidebar-nav-custom .c-sidebar-nav-link:hover {
+      transform: none;
+    }
+  }
+}
+//pour le logut le footer
+.sidebar-footer-custom {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+}
+
+.sidebar-btn {
+  flex: 1;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.sidebar-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.logout-btn:hover {
+  background: rgba(220,53,69,0.3);
+}

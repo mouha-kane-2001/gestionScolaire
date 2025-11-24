@@ -1,0 +1,315 @@
+<p>suivre-abscence-parent works!</p>
+<div class="container-fluid py-4">
+  <!-- En-tête -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h1 class="h3 mb-0 text-primary">
+            <i class="fas fa-calendar-times me-2"></i>
+            Suivi des Absences
+          </h1>
+          <p class="text-muted mb-0">Consultez les absences de vos enfants</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des enfants -->
+  <div *ngIf="!selectedEnfant" class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-child me-2"></i>
+            Mes Enfants
+          </h5>
+        </div>
+        <div class="card-body">
+          <!-- Loading -->
+          <div *ngIf="loading.enfants" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-2 text-muted">Chargement des enfants...</p>
+          </div>
+
+          <!-- Liste des enfants -->
+          <div *ngIf="!loading.enfants && enfants.length > 0" class="row">
+            <div *ngFor="let enfant of enfants" class="col-md-6 col-lg-4 mb-3">
+              <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body text-center">
+                  <div class="avatar-placeholder bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="fas fa-user-graduate fs-5"></i>
+                  </div>
+                  <h6 class="card-title mb-1">
+                    {{ enfant.user?.prenom }} {{ enfant.user?.nom }}
+                  </h6>
+                  <p class="text-muted small mb-2">
+                    Classe: {{ enfant.classe?.nom || 'Non assigné' }}
+                  </p>
+                  <div class="d-flex justify-content-center gap-2 small text-muted mb-3">
+                    <span>
+                      <i class="fas fa-calendar me-1"></i>
+                      {{ enfant.absences?.length || 0 }} absence(s)
+                    </span>
+                  </div>
+                  <button
+                    class="btn btn-primary btn-sm"
+                    (click)="voirAbsences(enfant)"
+                    [disabled]="loading.absences">
+                    <i class="fas fa-list me-1"></i>
+                    Voir les absences
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aucun enfant -->
+          <div *ngIf="!loading.enfants && enfants.length === 0" class="text-center py-5">
+            <i class="fas fa-users fs-1 text-muted mb-3"></i>
+            <h5 class="text-muted">Aucun enfant trouvé</h5>
+            <p class="text-muted">Aucun enfant n'est associé à votre compte.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Détail des absences d'un enfant -->
+  <div *ngIf="selectedEnfant" class="row">
+    <div class="col-12">
+      <!-- En-tête enfant -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <button class="btn btn-outline-secondary btn-sm me-3" (click)="retour()">
+                <i class="fas fa-arrow-left me-1"></i>
+                Retour
+              </button>
+              <h5 class="d-inline-block mb-0">
+                Absences de <strong>{{ selectedEnfant.user?.prenom }} {{ selectedEnfant.user?.nom }}</strong>
+              </h5>
+              <span class="badge bg-light text-dark ms-2">
+                Classe: {{ selectedEnfant.classe?.nom || 'Non assigné' }}
+              </span>
+            </div>
+            <button class="btn btn-outline-primary btn-sm" (click)="exporterAbsences()">
+              <i class="fas fa-download me-1"></i>
+              Exporter
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiques -->
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="card bg-primary text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h6 class="card-title">Total Absences</h6>
+                  <h3 class="mb-0">{{ stats.total }}</h3>
+                </div>
+                <div class="align-self-center">
+                  <i class="fas fa-calendar-times fs-2 opacity-50"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-success text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h6 class="card-title">Justifiées</h6>
+                  <h3 class="mb-0">{{ stats.justifiees }}</h3>
+                </div>
+                <div class="align-self-center">
+                  <i class="fas fa-check-circle fs-2 opacity-50"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-danger text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h6 class="card-title">Non Justifiées</h6>
+                  <h3 class="mb-0">{{ stats.nonJustifiees }}</h3>
+                </div>
+                <div class="align-self-center">
+                  <i class="fas fa-times-circle fs-2 opacity-50"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-warning text-dark">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h6 class="card-title">Taux d'Absentisme</h6>
+                  <h3 class="mb-0">{{ stats.tauxAbsentisme }}%</h3>
+                </div>
+                <div class="align-self-center">
+                  <i class="fas fa-chart-pie fs-2 opacity-50"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtres -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h6 class="card-title mb-0">
+            <i class="fas fa-filter me-2"></i>
+            Filtres
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label small">Matière</label>
+              <select class="form-select" [(ngModel)]="filtreMatiere" (change)="filtrerAbsences()">
+                <option value="">Toutes les matières</option>
+                <option *ngFor="let matiere of matieresUniques" [value]="matiere">
+                  {{ matiere }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">Motif</label>
+              <select class="form-select" [(ngModel)]="filtreMotif" (change)="filtrerAbsences()">
+                <option value="">Tous les motifs</option>
+                <option *ngFor="let motif of motifsUniques" [value]="motif">
+                  {{ getMotifLabel(motif) }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">Statut</label>
+              <select class="form-select" [(ngModel)]="filtreJustifiee" (change)="filtrerAbsences()">
+                <option value="">Tous</option>
+                <option value="true">Justifiées</option>
+                <option value="false">Non justifiées</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">Du</label>
+              <input type="date" class="form-control" [(ngModel)]="filtreDateDebut" (change)="filtrerAbsences()">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">Au</label>
+              <input type="date" class="form-control" [(ngModel)]="filtreDateFin" (change)="filtrerAbsences()">
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+              <button class="btn btn-outline-secondary w-100" (click)="reinitialiserFiltres()" title="Réinitialiser">
+                <i class="fas fa-undo"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liste des absences -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h6 class="card-title mb-0">
+            <i class="fas fa-list me-2"></i>
+            Liste des Absences
+            <span class="badge bg-primary ms-2">{{ absencesFiltrees.length }}</span>
+          </h6>
+          <span class="text-muted small">
+            {{ absencesFiltrees.length }} absence(s) sur {{ absences.length }}
+          </span>
+        </div>
+
+        <div class="card-body">
+          <!-- Loading -->
+          <div *ngIf="loading.absences" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-2 text-muted">Chargement des absences...</p>
+          </div>
+
+          <!-- Absences -->
+          <div *ngIf="!loading.absences && absencesFiltrees.length > 0">
+            <div *ngFor="let absence of absencesFiltrees" class="absence-item border-bottom pb-3 mb-3">
+              <div class="row align-items-center">
+                <div class="col-md-2">
+                  <div class="d-flex align-items-center">
+                    <div class="date-badge bg-light rounded p-2 text-center me-3">
+                      <div class="fw-bold text-primary">{{ absence.date_absence | date:'dd' }}</div>
+                      <div class="small text-muted">{{ absence.date_absence | date:'MMM' }}</div>
+                      <div class="small text-muted">{{ absence.date_absence | date:'yyyy' }}</div>
+                    </div>
+                    <div class="small text-muted">
+                      {{ absence.date_absence | date:'EEEE' }}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <strong class="d-block">{{ absence.matiere?.nom || 'Matière non spécifiée' }}</strong>
+                  <small class="text-muted">
+                    Par: {{ absence.professeur?.user?.prenom }} {{ absence.professeur?.user?.nom }}
+                  </small>
+                </div>
+                <div class="col-md-2">
+                  <span class="badge bg-secondary">{{ getMotifLabel(absence.motif) }}</span>
+                </div>
+                <div class="col-md-2">
+                  <span [class]="getBadgeClassJustifiee(absence.justifiee)">
+                    {{ getTextJustifiee(absence.justifiee) }}
+                  </span>
+                </div>
+                <div class="col-md-3">
+                  <div *ngIf="absence.commentaire" class="comment-box">
+                    <small class="text-muted">
+                      <i class="fas fa-comment me-1"></i>
+                      {{ absence.commentaire }}
+                    </small>
+                  </div>
+                  <div *ngIf="!absence.commentaire" class="text-muted small">
+                    <i class="fas fa-comment-slash me-1"></i>
+                    Aucun commentaire
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aucune absence -->
+          <div *ngIf="!loading.absences && absencesFiltrees.length === 0 && absences.length > 0" class="text-center py-5">
+            <i class="fas fa-search fs-1 text-muted mb-3"></i>
+            <h5 class="text-muted">Aucune absence trouvée</h5>
+            <p class="text-muted">Aucune absence ne correspond à vos critères de filtrage.</p>
+            <button class="btn btn-primary btn-sm" (click)="reinitialiserFiltres()">
+              <i class="fas fa-undo me-1"></i>
+              Réinitialiser les filtres
+            </button>
+          </div>
+
+          <!-- Aucune absence pour cet enfant -->
+          <div *ngIf="!loading.absences && absences.length === 0" class="text-center py-5">
+            <i class="fas fa-calendar-check fs-1 text-success mb-3"></i>
+            <h5 class="text-success">Aucune absence enregistrée</h5>
+            <p class="text-muted">
+              Félicitations ! {{ selectedEnfant.user?.prenom }} n'a aucune absence enregistrée.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,241 @@
+<div class="dashboard-parent">
+  <!-- En-tête -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Tableau de Bord Parent</h1>
+    <div class="d-flex gap-2">
+      <button cButton color="primary" routerLink="/parent/messages">
+        <i class="cil-envelope-open"></i> Messages
+      </button>
+      <button cButton color="success" routerLink="/parent/notes">
+        <i class="cil-notes"></i> Notes
+      </button>
+    </div>
+  </div>
+
+  <!-- Cartes de statistiques -->
+  <c-row class="mb-4">
+    <c-col xs="12" sm="6" lg="3">
+      <c-card class="mb-4">
+        <c-card-body class="text-center">
+          <div class="text-primary mb-3">
+            <i class="cil-user" style="font-size: 2rem;"></i>
+          </div>
+          <div class="fs-4 fw-bold">{{ stats.totalEleves }}</div>
+          <div class="text-medium-emphasis">Élève(s)</div>
+        </c-card-body>
+      </c-card>
+    </c-col>
+
+    <c-col xs="12" sm="6" lg="3">
+      <c-card class="mb-4">
+        <c-card-body class="text-center">
+          <div class="text-warning mb-3">
+            <i class="cil-warning" style="font-size: 2rem;"></i>
+          </div>
+          <div class="fs-4 fw-bold">{{ stats.absencesNonJustifiees }}</div>
+          <div class="text-medium-emphasis">Absences non justifiées</div>
+        </c-card-body>
+      </c-card>
+    </c-col>
+
+    <c-col xs="12" sm="6" lg="3">
+      <c-card class="mb-4">
+        <c-card-body class="text-center">
+          <div class="text-info mb-3">
+            <i class="cil-calendar" style="font-size: 2rem;"></i>
+          </div>
+          <div class="fs-4 fw-bold">{{ stats.convocationsEnAttente }}</div>
+          <div class="text-medium-emphasis">Convocations en attente</div>
+        </c-card-body>
+      </c-card>
+    </c-col>
+
+    <c-col xs="12" sm="6" lg="3">
+      <c-card class="mb-4">
+        <c-card-body class="text-center">
+          <div class="text-success mb-3">
+            <i class="cil-chart" style="font-size: 2rem;"></i>
+          </div>
+          <div class="fs-4 fw-bold">{{ stats.moyenneGenerale | number:'1.1-1' }}/20</div>
+          <div class="text-medium-emphasis">Moyenne générale</div>
+        </c-card-body>
+      </c-card>
+    </c-col>
+  </c-row>
+
+  <!-- Contenu principal -->
+  <c-row>
+    <!-- Colonne de gauche - Liste des élèves et graphiques -->
+    <c-col lg="8">
+      <!-- Liste des élèves -->
+      <c-card class="mb-4">
+        <c-card-header>
+          <h5 class="card-title mb-0">Mes Élèves</h5>
+        </c-card-header>
+        <c-card-body>
+          <c-row>
+            <c-col *ngFor="let eleve of eleves" xs="12" sm="6" class="mb-3">
+              <div class="d-flex align-items-center p-3 border rounded">
+
+                <div class="flex-grow-1 ms-3">
+                  <h6 class="mb-1">
+                        {{eleve.user?.prenom }} {{eleve.user?.nom}}
+                        </h6>
+                  <p class="text-muted mb-0">  {{eleve.classe.nom  }}</p>
+                </div>
+                <div class="flex-shrink-0">
+                  <button cButton color="outline-primary" size="sm" routerLink="/parent/notes">
+                    Voir notes
+                  </button>
+                </div>
+              </div>
+            </c-col>
+          </c-row>
+        </c-card-body>
+      </c-card>
+
+      <!-- Graphiques -->
+      <c-row>
+        <c-col lg="6">
+          <c-card class="mb-4">
+            <c-card-header>
+              <h6 class="card-title mb-0">Moyennes par matière</h6>
+            </c-card-header>
+            <c-card-body>
+              <div style="height: 250px;">
+                <c-chart type="bar" [data]="chartData.notes" [options]="chartOptions.notes"></c-chart>
+              </div>
+            </c-card-body>
+          </c-card>
+        </c-col>
+        <c-col lg="6">
+          <c-card class="mb-4">
+            <c-card-header>
+              <h6 class="card-title mb-0">Taux de présence</h6>
+            </c-card-header>
+            <c-card-body>
+              <div style="height: 250px;">
+                <c-chart type="doughnut" [data]="chartData.presence" [options]="chartOptions.presence"></c-chart>
+              </div>
+            </c-card-body>
+          </c-card>
+        </c-col>
+      </c-row>
+    </c-col>
+
+    <!-- Colonne de droite - Absences, Convocations, Notes récentes -->
+    <c-col lg="4">
+      <!-- Absences récentes -->
+      <c-card class="mb-4">
+        <c-card-header>
+          <h6 class="card-title mb-0">Absences récentes</h6>
+        </c-card-header>
+        <c-card-body>
+          <div *ngFor="let absence of absencesRecentes" class="border-bottom pb-2 mb-2">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+  <strong>{{ absence.eleve?.prenom  }} {{ absence.eleve?.nom   }}</strong>
+               <div class="text-muted small">{{  formatDate(absence.date_absence)}}</div>
+                <div class="small">{{ absence.motif }}</div>
+              </div>
+              <span [ngClass]="'badge ' + getAbsenceBadgeClass(absence.justifiee)">
+                {{ getAbsenceText(absence.justifiee) }}
+              </span>
+            </div>
+          </div>
+          <div *ngIf="absencesRecentes.length === 0" class="text-center text-muted py-3">
+            Aucune absence récente
+          </div>
+        </c-card-body>
+        <c-card-footer>
+          <button cButton color="outline-primary" size="sm" class="w-100" routerLink="/parent/absences">
+            Voir toutes les absences
+          </button>
+        </c-card-footer>
+      </c-card>
+
+      <!-- Convocations récentes -->
+      <c-card class="mb-4">
+        <c-card-header>
+          <h6 class="card-title mb-0">Convocations récentes</h6>
+        </c-card-header>
+        <c-card-body>
+          <div *ngFor="let convocation of convocationsRecentes" class="border-bottom pb-2 mb-2">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+
+                <h6 class="mb-1">
+                        {{convocation.eleve?.user?.prenom  }} {{convocation.eleve?.user?.nom}}
+                        </h6>
+                  <p class="text-muted mb-0">  {{ convocation.eleve?.classe?.nom }}  </p>
+
+
+
+                <div class="text-muted small">
+                  {{ formatDate(convocation.date_convocation) }}
+                </div>
+                <div class="small">{{ convocation.message }}</div>
+              </div>
+              <span [ngClass]="'badge ' + getStatutBadgeClass(convocation.etat)">
+                {{ getStatutText(convocation.etat) }}
+              </span>
+            </div>
+          </div>
+          <div *ngIf="convocationsRecentes.length === 0" class="text-center text-muted py-3">
+            Aucune convocation récente
+          </div>
+        </c-card-body>
+        <c-card-footer>
+          <button cButton color="outline-info" size="sm" class="w-100" routerLink="/parent/convocations">
+            Voir toutes les convocations
+          </button>
+        </c-card-footer>
+      </c-card>
+
+      <!-- Notes récentes -->
+<!-- Notes récentes -->
+<c-card class="mb-4">
+  <c-card-header>
+    <h6 class="card-title mb-0">Notes récentes</h6>
+  </c-card-header>
+  <c-card-body>
+    <!-- Afficher toutes les notes de tous les élèves -->
+    <div *ngFor="let eleve of notesRecentes" class="mb-4">
+     <div>
+            <strong>{{ eleve.eleve  }}  </strong>
+            </div>
+
+      <div *ngFor="let note of eleve.notes" class="border-bottom pb-2 mb-2 ms-3">
+        <div class="d-flex justify-content-between align-items-center">
+
+          <div>
+            <strong>{{ note.matiere }}</strong>
+            <div class="text-muted small">{{ note.type }}</div>
+            <div class="small">{{ formatDate(note.date) }}</div>
+            <div class="small">Prof: {{ note.prof }}</div>
+          </div>
+          <div [ngClass]="'fs-5 fw-bold ' + getNoteColor(+note.valeur)">
+  {{ note.valeur | number:'1.1-1' }}
+</div>
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- Message si aucun élève ou aucune note -->
+    <div *ngIf="notesRecentes.length === 0" class="text-center text-muted py-3">
+      Aucune note récente
+    </div>
+  </c-card-body>
+  <c-card-footer>
+    <button cButton color="outline-success" size="sm" class="w-100" routerLink="/parent/notes">
+      Voir toutes les notes
+    </button>
+  </c-card-footer>
+</c-card>
+
+
+    </c-col>
+  </c-row>
+</div>

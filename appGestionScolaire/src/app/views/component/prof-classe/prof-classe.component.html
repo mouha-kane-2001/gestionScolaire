@@ -1,0 +1,98 @@
+<div class="compact-affectation-container">
+  <!-- En-tête compact -->
+  <div class="compact-header">
+    <div class="header-icon">
+      <i class="bi bi-person-gear"></i>
+    </div>
+    <div class="header-text">
+      <h2>Affecter un professeur</h2>
+      <p>Sélectionnez un professeur et ses classes</p>
+    </div>
+  </div>
+
+  <!-- Indicateur de chargement -->
+  <div *ngIf="isLoading" class="compact-loading">
+    <div class="spinner"></div>
+    <span>Chargement...</span>
+  </div>
+
+  <!-- Formulaire compact -->
+  <form *ngIf="!isLoading"
+        [formGroup]="assignForm"
+        (ngSubmit)="onSubmit()"
+        class="compact-form">
+
+    <div class="form-row">
+      <!-- Sélection du professeur -->
+      <div class="form-section professor-section">
+        <label class="section-label">
+          <i class="bi bi-person-badge"></i>
+          Professeur
+        </label>
+        <div class="select-wrapper">
+          <select formControlName="professeurId" class="compact-select">
+            <option value="" disabled selected>👨‍🏫 Choisir un professeur</option>
+            <option *ngFor="let prof of professeurs" [value]="prof.id">
+              {{ prof.user.prenom }} {{ prof.user.nom | uppercase }}
+            </option>
+          </select>
+          <i class="bi bi-chevron-down"></i>
+        </div>
+        <div *ngIf="professeurId?.touched && professeurId?.invalid" class="error-message">
+          <i class="bi bi-exclamation-circle"></i>
+          Sélection requise
+        </div>
+      </div>
+
+      <!-- Sélection des classes -->
+      <div class="form-section classes-section">
+        <label class="section-label">
+          <i class="bi bi-people-fill"></i>
+          Classes
+        </label>
+        <div class="select-wrapper">
+          <select formControlName="classesIds" multiple size="3" class="compact-select multiple">
+            <option *ngFor="let classe of classes" [value]="classe.id">
+              🏫 {{ classe.nom }}
+            </option>
+          </select>
+        </div>
+        <div *ngIf="classesIds?.touched && classesIds?.invalid" class="error-message">
+          <i class="bi bi-exclamation-circle"></i>
+          Au moins une classe requise
+        </div>
+      </div>
+    </div>
+
+    <!-- Classes sélectionnées -->
+    <div *ngIf="classesIds?.value?.length > 0" class="selected-chips">
+      <div class="chips-header">
+        <span>Classes sélectionnées ({{ classesIds?.value?.length }})</span>
+      </div>
+      <div class="chips-container">
+        <div *ngFor="let classId of classesIds?.value" class="chip">
+          {{ getClassName(classId) }}
+          <button type="button" class="chip-remove" (click)="removeClass(classId)">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bouton d'action -->
+    <div class="form-actions">
+      <button type="submit"
+              class="compact-btn primary"
+              [disabled]="isSubmitting || assignForm.invalid">
+        <span *ngIf="!isSubmitting">
+          <i class="bi bi-check-lg"></i>
+          Affecter
+        </span>
+        <span *ngIf="isSubmitting">
+          <i class="bi bi-arrow-repeat spinner"></i>
+          Traitement...
+        </span>
+      </button>
+    </div>
+  </form>
+</div>

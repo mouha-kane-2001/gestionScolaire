@@ -1,0 +1,194 @@
+<div class="dashboard-eleve">
+  <!-- En-tête avec dégradé -->
+  <div class="student-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="mb-1 text-black ">Bonjour  {{ eleves?.prenom }} {{ eleves?.nom }} ! 👋</h1>
+        <p class="text-black-50 mb-0">  {{ eleves?.classe   }} </p>
+      </div>
+      <div class="d-flex gap-2">
+
+        <button cButton color="light" size="sm" routerLink="/eleve/notes">
+          <i class="cil-notes me-1"></i> Mes notes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cartes de statistiques colorées -->
+  <c-row class="mb-4">
+    <c-col xs="6" sm="3">
+      <div class="stat-card stat-card-1 text-center p-3">
+        <div class="stat-icon mb-2">
+          <i class="cil-chart"></i>
+        </div>
+        <div class="fs-3 fw-bold text-black">{{ stats.moyenneGenerale | number:'1.1-1' }}</div>
+        <div class="text-black-80">Moyenne</div>
+        <div class="text-black-60 small">/20</div>
+      </div>
+    </c-col>
+    <c-col xs="6" sm="3">
+      <div class="stat-card stat-card-2 text-center p-3">
+        <div class="stat-icon mb-2">
+          <i class="cil-check"></i>
+        </div>
+        <div class="fs-3 fw-bold text-black">{{ stats.presence | number:'1.0-0' }}%</div>
+        <div class="text-black-80">Présence</div>
+        <div class="text-black-60 small">{{ stats.absencesTotal }} absences</div>
+      </div>
+    </c-col>
+    <c-col xs="6" sm="3">
+      <div class="stat-card stat-card-3 text-center p-3">
+        <div class="stat-icon mb-2">
+          <i class="cil-warning"></i>
+        </div>
+        <div class="fs-3 fw-bold text-black">{{ stats.absencesTotal }}</div>
+        <div class="text-black-80">Absences</div>
+        <div class="text-black-60 small">Cette période</div>
+      </div>
+    </c-col>
+    <c-col xs="6" sm="3">
+      <div class="stat-card stat-card-4 text-center p-3">
+        <div class="stat-icon mb-2">
+          <i class="cil-bell"></i>
+        </div>
+        <div class="fs-3 fw-bold text-black">{{ stats.convocations }}</div>
+        <div class="ttext-black-80">Convocations</div>
+        <div class="text-black-60 small">En attente</div>
+      </div>
+    </c-col>
+  </c-row>
+
+  <c-row>
+    <!-- Colonne de gauche -->
+    <c-col lg="8">
+      <!-- Dernières notes -->
+      <c-card class="mb-4 custom-card">
+        <c-card-header class="card-header-custom">
+          <h5 class="mb-0 text-black ">📚 Dernières notes</h5>
+        </c-card-header>
+        <c-card-body>
+          <div *ngFor="let note of notesRecentes; let i = index"
+               class="note-item d-flex justify-content-between align-items-center p-3 rounded mb-2"
+               [ngClass]="'note-item-' + (i % 4)">
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center mb-1">
+                <strong class="me-2">{{ note.matiere }}</strong>
+                <span class="badge note-type-badge">{{ note.type }}</span>
+              </div>
+              <div class="text-muted small">{{ formatDate(note.date) }}</div>
+            </div>
+            <div class="text-end">
+              <div [ngClass]="'note-value ' + getNoteColor(note.valeur)">
+                {{ note.valeur | number:'1.1-1' }}/20
+              </div>
+             </div>
+          </div>
+          <div *ngIf="notesRecentes.length === 0" class="text-center text-muted py-4">
+            <i class="cil-notes display-4 text-muted"></i>
+            <p class="mt-2 mb-0">Aucune note récente</p>
+          </div>
+        </c-card-body>
+      </c-card>
+
+      <!-- Dernières absences -->
+      <c-card class="mb-4 custom-card">
+        <c-card-header class="card-header-custom">
+          <h5 class="mb-0 text-black">📅 Dernières absences</h5>
+        </c-card-header>
+        <c-card-body>
+          <div *ngFor="let absence of absencesRecentes"
+               class="absence-item d-flex justify-content-between align-items-center p-3 rounded mb-2 bg-light">
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center mb-1">
+                <strong class="me-2">{{ absence.matiere }}</strong>
+                <span [ngClass]="'badge ' + getAbsenceBadgeClass(absence.justifiee)">
+                  {{ getAbsenceText(absence.justifiee) }}
+                </span>
+              </div>
+              <div class="text-muted small">{{ absence.motif }}</div>
+              <div class="text-muted smaller">{{ formatDate(absence.date) }}</div>
+            </div>
+            <div class="absence-icon">
+              <i [class]="absence.justifiee ? 'cil-check text-success' : 'cil-warning text-danger'"></i>
+            </div>
+          </div>
+          <div *ngIf="absencesRecentes.length === 0" class="text-center text-muted py-4">
+            <i class="cil-check display-4 text-success"></i>
+            <p class="mt-2 mb-0">Aucune absence récente</p>
+          </div>
+        </c-card-body>
+      </c-card>
+    </c-col>
+
+    <!-- Colonne de droite -->
+    <c-col lg="4">
+      <!-- Matières -->
+      <c-card class="mb-4 custom-card">
+        <c-card-header class="card-header-custom">
+          <h5 class="mb-0 text-black">🎯 Mes matières</h5>
+        </c-card-header>
+        <c-card-body>
+          <div *ngFor="let matiere of matieres; let i = index"
+               class="matiere-item d-flex justify-content-between align-items-center p-3 rounded mb-2"
+               [ngClass]="'matiere-item-' + (i % 6)">
+            <div class="flex-grow-1">
+              <strong class="d-block">{{ matiere.nom }}</strong>
+              <div class="text-muted small">Moyenne: {{ matiere.moyenne | number:'1.1-1' }}/20</div>
+            </div>
+            <div [ngClass]="'evolution ' + (matiere.evolution >= 0 ? 'positive' : 'negative')">
+              <i [class]="matiere.evolution >= 0 ? 'cil-arrow-top' : 'cil-arrow-bottom'"></i>
+              <span class="small">
+                {{ matiere.evolution >= 0 ? '+' : '' }}{{ matiere.evolution | number:'1.1-1' }}
+              </span>
+            </div>
+          </div>
+        </c-card-body>
+      </c-card>
+
+      <!-- Derniers messages -->
+      <c-card class="mb-4 custom-card">
+        <c-card-header class="card-header-custom">
+          <h5 class="mb-0 text-black   ">✉️ Derniers messages</h5>
+        </c-card-header>
+        <c-card-body>
+          <div *ngFor="let message of messagesRecents"
+               class="message-item p-3 rounded mb-2 bg-light">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <strong class="message-expediteur">{{ message.expediteur }}</strong>
+              <span *ngIf="!message.lu" class="badge bg-primary pulse">Nouveau</span>
+            </div>
+            <div class="text-muted small mb-1">{{ message.objet }}</div>
+            <div class="text-muted smaller">{{ formatDate(message.date) }}</div>
+          </div>
+          <div *ngIf="messagesRecents.length === 0" class="text-center text-muted py-3">
+            <i class="cil-envelope-open display-4 text-muted"></i>
+            <p class="mt-2 mb-0">Aucun message</p>
+          </div>
+        </c-card-body>
+      </c-card>
+
+      <!-- Convocations -->
+      <c-card class="custom-card">
+        <c-card-header class="card-header-custom">
+          <h5 class="mb-0 text-black">🔔 Convocations</h5>
+        </c-card-header>
+        <c-card-body>
+          <div *ngFor="let convocation of convocationsRecentes"
+               class="convocation-item p-3 rounded mb-2 bg-warning bg-opacity-10">
+            <div class="d-flex align-items-start mb-2">
+              <i class="cil-bell text-warning me-2 mt-1"></i>
+              <strong class="flex-grow-1">{{ convocation.motif }}</strong>
+            </div>
+            <div class="text-muted small mb-1">{{ convocation.professeur }}</div>
+            <div class="text-muted smaller">{{ formatDate(convocation.date) }}</div>
+          </div>
+          <div *ngIf="convocationsRecentes.length === 0" class="text-center text-muted py-3">
+            <i class="cil-bell display-4 text-muted"></i>
+            <p class="mt-2 mb-0">Aucune convocation</p>
+          </div>
+        </c-card-body>
+      </c-card>
+    </c-col>
+  </c-row>
+</div>

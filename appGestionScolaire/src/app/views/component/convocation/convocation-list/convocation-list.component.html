@@ -1,0 +1,252 @@
+<div class="convocation-container">
+  <!-- En-tête amélioré -->
+  <div class="header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="title">Mes Convocations</h1>
+        <p class="subtitle">Gérez les convocations de vos enfants</p>
+      </div>
+      <div class="header-actions">
+        <div class="filter-section">
+          <div class="filter-group">
+            <label for="eleve-filter">Filtrer par élève</label>
+            <select id="eleve-filter" class="filter-select" [(ngModel)]="filtreEleve" (change)="filtrerConvocations()">
+              <option value="">Tous les élèves</option>
+              <option *ngFor="let eleve of eleves" [value]="eleve.id.toString()">
+                {{ eleve.user?.prenom }} {{ eleve.user?.nom }}
+              </option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="statut-filter">Filtrer par statut</label>
+            <select id="statut-filter" class="filter-select" [(ngModel)]="filtreStatut" (change)="filtrerConvocations()">
+              <option value="">Tous les statuts</option>
+              <option value="non_lue">Non lues</option>
+              <option value="lue">Lues</option>
+            </select>
+          </div>
+        </div>
+        <div class="stats" *ngIf="convocations.length > 0">
+          <div class="stat-card" style="color: black;">
+            <span class="stat-value">{{ convocationsFiltrees.length }}</span>
+            <span class="stat-label" >Convocations</span>
+          </div>
+          <div class="stat-card unread">
+            <span class="stat-value">{{ getUnreadCount() }}</span>
+            <span class="stat-label">Non lues</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chargement -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner-container">
+      <div class="spinner"></div>
+    </div>
+    <span>Chargement des convocations...</span>
+  </div>
+
+  <!-- État vide -->
+  <div *ngIf="!loading && convocations.length === 0" class="empty-state">
+    <div class="empty-icon">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h3>Aucune convocation</h3>
+    <p>Vous n'avez reçu aucune convocation pour le moment.</p>
+  </div>
+
+  <!-- Liste des convocations -->
+  <div *ngIf="!loading && convocations.length > 0" class="convocations-list">
+    <div *ngFor="let convocation of convocationsPage"
+         class="convocation-item"
+         [class.unread]="convocation.etat === 'non_lue'"
+         (click)="openDetails(convocation)">
+
+      <div class="convocation-indicator" *ngIf="convocation.etat === 'non_lue'">
+        <div class="indicator-dot"></div>
+      </div>
+
+      <div class="convocation-main">
+        <div class="convocation-header">
+          <div class="header-left">
+            <h3 class="convocation-objet">{{ convocation.objet }}</h3>
+            <div class="eleve-tag">
+              <span class="eleve-name" style="background: #ac87b7 ">{{ convocation.eleve?.user?.prenom }} {{ convocation.eleve?.user?.nom }}</span>---
+              <span class="classe" style="background: #ac87b7">{{ convocation.eleve?.classe?.nom }}</span>
+            </div>
+          </div>
+          <div class="convocation-meta">
+            <span class="date">{{ convocation.date_convocation | date:'dd/MM/yyyy' }}</span>
+            <span class="badge" [class.badge-unread]="convocation.etat === 'non_lue'">
+              {{ convocation.etat === 'non_lue' ? 'Nouvelle' : 'Lue' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="convocation-content">
+          <p class="message-preview">{{ getMessagePreview(convocation.message) }}</p>
+        </div>
+
+        <div class="convocation-footer">
+          <div class="date-info">
+            <span>Envoyé le {{ convocation.created_at | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <button class="btn-details" (click)="openDetails(convocation); $event.stopPropagation()">
+            <span>Voir détails</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && convocationsFiltrees.length > 0" class="pagination">
+    <button class="btn-pagination prev" [disabled]="page === 1" (click)="previousPage()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Précédent
+    </button>
+    <div class="page-info">
+      <span class="current-page">{{ page }}</span>
+      <span class="page-separator">sur</span>
+      <span class="total-pages">{{ totalPages }}</span>
+    </div>
+    <button class="btn-pagination next" [disabled]="page === totalPages" (click)="nextPage()">
+      Suivant
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Modal de détails -->
+  <div *ngIf="showModal" class="modal" (click)="closeModal($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">
+          <h2>Détails de la convocation</h2>
+          <span class="modal-subtitle">Informations complètes</span>
+        </div>
+        <button class="btn-close" (click)="closeModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedConvocation">
+        <div class="detail-grid">
+          <!-- Colonne informations -->
+          <div class="info-column">
+            <div class="detail-header">
+              <div class="detail-title">
+                <h3>{{ selectedConvocation.objet }}</h3>
+                <span class="badge" [class.badge-unread]="selectedConvocation.etat === 'non_lue'">
+                  {{ selectedConvocation.etat === 'non_lue' ? 'Non lue' : 'Lue' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <h4 class="info-card-title">Informations</h4>
+              <div class="info-list">
+                <div class="info-item">
+                  <div class="info-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div class="info-content">
+                    <label>Élève concerné :</label>
+                    <span>{{ selectedConvocation.eleve?.user?.prenom }} {{ selectedConvocation.eleve?.user?.nom }}</span>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <div class="info-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 19L12 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M5 12H3C2.46957 12 1.96086 12.2107 1.58579 12.5858C1.21071 12.9609 1 13.4696 1 14V19C1 19.5304 1.21071 20.0391 1.58579 20.4142C1.96086 20.7893 2.46957 21 3 21H21C21.5304 21 22.0391 20.7893 22.4142 20.4142C22.7893 20.0391 23 19.5304 23 19V14C23 13.4696 22.7893 12.9609 22.4142 12.5858C22.0391 12.2107 21.5304 12 21 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M16 5C16 6.06087 15.5786 7.07828 14.8284 7.82843C14.0783 8.57857 13.0609 9 12 9C10.9391 9 9.92172 8.57857 9.17157 7.82843C8.42143 7.07828 8 6.06087 8 5C8 3.93913 8.42143 2.92172 9.17157 2.17157C9.92172 1.42143 10.9391 1 12 1C13.0609 1 14.0783 1.42143 14.8284 2.17157C15.5786 2.92172 16 3.93913 16 5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div class="info-content">
+                    <label>Classe :</label>
+                    <span>{{ selectedConvocation.eleve?.classe?.nom }}</span>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <div class="info-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 7V3C8 2.46957 8.21071 1.96086 8.58579 1.58579C8.96086 1.21071 9.46957 1 10 1H14C14.5304 1 15.0391 1.21071 15.4142 1.58579C15.7893 1.96086 16 2.46957 16 3V7M19 7H5C4.46957 7 3.96086 7.21071 3.58579 7.58579C3.21071 7.96086 3 8.46957 3 9V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H19C19.5304 21 20.0391 20.7893 20.4142 20.4142C20.7893 20.0391 21 19.5304 21 19V9C21 8.46957 20.7893 7.96086 20.4142 7.58579C20.0391 7.21071 19.5304 7 19 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div class="info-content">
+                    <label>Date de convocation :</label>
+                    <span>{{ selectedConvocation.date_convocation | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <div class="info-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 8V12L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div class="info-content">
+                    <label>Date d'envoi :</label>
+                    <span>{{ selectedConvocation.created_at | date:'dd/MM/yyyy à HH:mm' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Colonne message -->
+          <div class="message-column">
+            <div class="message-card">
+              <div class="message-header">
+                <h4>Message</h4>
+                <div class="message-actions">
+                  <button class="btn-copy" title="Copier le message">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 5H6C5.46957 5 4.96086 5.21071 4.58579 5.58579C4.21071 5.96086 4 6.46957 4 7V19C4 19.5304 4.21071 20.0391 4.58579 20.4142C4.96086 20.7893 5.46957 21 6 21H16C16.5304 21 17.0391 20.7893 17.4142 20.4142C17.7893 20.0391 18 19.5304 18 19V17M8 5C8 4.46957 8.21071 3.96086 8.58579 3.58579C8.96086 3.21071 9.46957 3 10 3H14C14.5304 3 15.0391 3.21071 15.4142 3.58579C15.7893 3.96086 16 4.46957 16 5V9C16 9.53043 15.7893 10.0391 15.4142 10.4142C15.0391 10.7893 14.5304 11 14 11H10C9.46957 11 8.96086 10.7893 8.58579 10.4142C8.21071 10.0391 8 9.53043 8 9V5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="message-content">
+                {{ selectedConvocation.message }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Fermer</button>
+        <button *ngIf="selectedConvocation?.etat === 'non_lue'"
+                class="btn btn-primary"
+                (click)="markAsRead(selectedConvocation)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Marquer comme lue
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

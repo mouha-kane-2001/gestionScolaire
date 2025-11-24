@@ -1,0 +1,164 @@
+<div class="convocation-container">
+  <!-- En-tête compact -->
+  <div class="compact-header">
+    <div class="header-icon">
+      <i class="bi bi-calendar-event"></i>
+    </div>
+    <div class="" style="color: white;">
+      <h1 style="color: white;">Envoyer une Convocation</h1>
+      <p style="color: white;">Planifiez une rencontre avec les parents d'élèves</p>
+    </div>
+  </div>
+
+  <!-- Formulaire compact -->
+  <div class="compact-form-card">
+    <form [formGroup]="convocationForm" (ngSubmit)="envoyerConvocation()" class="compact-form">
+
+      <!-- Section Destinataire en ligne -->
+      <div class="form-section compact">
+        <div class="section-label">
+          <i class="bi bi-send"></i>
+          Type de convocation
+        </div>
+
+        <div class="radio-cards compact">
+          <label class="radio-card compact" [class.active]="typeDestinataire === 'parent'">
+            <input type="radio" [(ngModel)]="typeDestinataire" value="parent"
+                   [ngModelOptions]="{standalone: true}">
+            <div class="card-content">
+              <i class="bi bi-person"></i>
+              <span>Parent individuel</span>
+            </div>
+          </label>
+
+          <label class="radio-card compact" [class.active]="typeDestinataire === 'classe'">
+            <input type="radio" [(ngModel)]="typeDestinataire" value="classe"
+                   [ngModelOptions]="{standalone: true}">
+            <div class="card-content">
+              <i class="bi bi-people"></i>
+              <span>Classe entière</span>
+            </div>
+          </label>
+
+          <label class="radio-card compact" [class.active]="typeDestinataire === 'tous_parents'">
+            <input type="radio" [(ngModel)]="typeDestinataire" value="tous_parents"
+                   [ngModelOptions]="{standalone: true}">
+            <div class="card-content">
+              <i class="bi bi-building"></i>
+              <span>Tous les parents</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Sélections en ligne -->
+      <div class="form-row">
+        <!-- Sélection Parent -->
+        <div *ngIf="typeDestinataire === 'parent'" class="form-group compact">
+          <label class="form-label">Sélectionner un élève</label>
+          <div class="select-wrapper">
+            <select formControlName="eleve_id" class="compact-select">
+              <option value="" disabled selected>👨‍👩‍👧‍👦 Choisir un élève...</option>
+              <option *ngFor="let eleve of filteredEleves" [value]="eleve.id">
+                {{ eleve.prenom }} {{ eleve.nom }} - {{ eleve.classe.nom }}
+              </option>
+            </select>
+            <i class="bi bi-chevron-down"></i>
+          </div>
+          <div *ngIf="convocationForm.get('eleve_id')?.invalid && convocationForm.get('eleve_id')?.touched"
+               class="error-message">
+            <i class="bi bi-exclamation-circle"></i>
+            Sélection requise
+          </div>
+        </div>
+
+        <!-- Sélection Classe -->
+        <div *ngIf="typeDestinataire === 'classe'" class="form-group compact">
+          <label class="form-label">Sélectionner une classe</label>
+          <div class="select-wrapper">
+            <select formControlName="classe_id" class="compact-select">
+              <option value="" disabled selected>🏫 Choisir une classe...</option>
+              <option *ngFor="let classe of classes" [value]="classe.id">
+                {{ classe.nom }}
+              </option>
+            </select>
+            <i class="bi bi-chevron-down"></i>
+          </div>
+          <div *ngIf="convocationForm.get('classe_id')?.invalid && convocationForm.get('classe_id')?.touched"
+               class="error-message">
+            <i class="bi bi-exclamation-circle"></i>
+            Sélection requise
+          </div>
+        </div>
+
+        <!-- Info Tous les Parents -->
+        <div *ngIf="typeDestinataire === 'tous_parents'" class="info-badge">
+          <i class="bi bi-megaphone"></i>
+          <span>{{ eleves.length }} parents - {{ classes.length }} classes</span>
+        </div>
+      </div>
+
+      <!-- Détails en ligne -->
+      <div class="form-row">
+        <div class="form-group compact">
+          <label class="form-label">Date et heure</label>
+          <input type="datetime-local"
+                 class="compact-input"
+                 formControlName="date_convocation">
+          <div *ngIf="convocationForm.get('date_convocation')?.invalid && convocationForm.get('date_convocation')?.touched"
+               class="error-message" style="color: red;">
+            <i class="bi bi-exclamation-circle" ></i>
+            Date requise
+          </div>
+        </div>
+
+        <div class="form-group compact expand">
+          <label class="form-label">Objet</label>
+          <input type="text"
+                 class="compact-input"
+                 formControlName="objet"
+                 [placeholder]="getObjetPlaceholder()">
+          <div *ngIf="convocationForm.get('objet')?.invalid && convocationForm.get('objet')?.touched"
+               class="error-message" style="color: red;">
+            <i class="bi bi-exclamation-circle"></i>
+            Objet requis
+          </div>
+        </div>
+      </div>
+
+      <!-- Message -->
+      <div class="form-group compact full-width">
+        <label class="form-label">Message</label>
+        <textarea class="compact-textarea"
+                  formControlName="message"
+                  rows="4"
+                  [placeholder]="getMessagePlaceholder()">
+        </textarea>
+        <div class="input-footer">
+          <div class="character-count">
+            {{ convocationForm.get('message')?.value?.length || 0 }} caractères
+          </div>
+          <div *ngIf="convocationForm.get('message')?.invalid && convocationForm.get('message')?.touched"
+               class="error-message">
+            <i class="bi bi-exclamation-circle"></i>
+            Message requis (min. 10 caractères)
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions compact">
+        <button type="button" class="btn btn-secondary compact" (click)="resetForm()">
+          <i class="bi bi-arrow-counterclockwise"></i>
+          Annuler
+        </button>
+        <button type="submit" style="color: rgb(47, 255, 89);"
+                class="btn btn-primary compact"
+                [disabled]="convocationForm.invalid">
+          <i class="bi bi-send-check" ></i>
+          Envoyer
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

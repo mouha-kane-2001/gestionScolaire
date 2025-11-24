@@ -1,0 +1,162 @@
+<div class="container-fluid py-4">
+  <!-- Header avec statistiques -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2 class="h3 mb-1">📊 Mes Notes</h2>
+          <p class="text-muted mb-0">Suivi de mes résultats académiques</p>
+        </div>
+        <div class="text-end">
+          <div class="h4 text-primary mb-0">{{ calculerMoyenne() }}/20</div>
+          <small class="text-muted">Moyenne générale</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Matière</label>
+              <select class="form-select" [(ngModel)]="filtreMatiere" (change)="filtrerNotes()">
+                <option value="">Toutes les matières</option>
+                <option *ngFor="let matiere of matieresUniques" [value]="matiere">
+                  {{ matiere }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Type</label>
+              <select class="form-select" [(ngModel)]="filtreType" (change)="filtrerNotes()">
+                <option value="">Tous les types</option>
+                <option value="devoir">Devoir</option>
+                <option value="examen">Examen</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Période</label>
+              <select class="form-select" [(ngModel)]="filtrePeriode" (change)="filtrerNotes()">
+                <option value="">Toutes périodes</option>
+                <option *ngFor="let periode of periodesUniques" [value]="periode">
+                  {{ periode }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-outline-secondary w-100" (click)="reinitialiserFiltres()">
+                Réinitialiser
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cartes de statistiques -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body text-center">
+          <div class="h2 mb-0">{{ notesFiltrees.length }}</div>
+          <small>Notes totales</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body text-center">
+          <div class="h2 mb-0">{{ countNotesSup10() }}</div>
+          <small>Notes ≥ 10/20</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-dark">
+        <div class="card-body text-center">
+          <div class="h2 mb-0">{{ countNotesInf10() }}</div>
+          <small>Notes < 10/20</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body text-center">
+          <div class="h2 mb-0">{{ getPourcentageReussite() }}%</div>
+          <small>Taux de réussite</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau des notes -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3">
+      <h5 class="card-title mb-0">Détail des notes</h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-4">Matière</th>
+              <th>Type</th>
+              <th>Note</th>
+              <th>Appréciation</th>
+              <th>Période</th>
+              <th>Date</th>
+              <th class="pe-4">Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let note of notesFiltrees" class="align-middle">
+              <td class="ps-4 fw-semibold">
+                {{ note.matiere?.nom || 'Non spécifié' }}
+              </td>
+              <td>
+                <span [class]="getBadgeClass(note.type)" class="badge">
+                  {{ note.type }}
+                </span>
+              </td>
+              <td>
+                <span [class]="getNoteClass(note.valeur)" class="fw-bold fs-6">
+                  {{ note.valeur }}/20
+                </span>
+              </td>
+              <td>
+                <span [class]="getAppreciationClass(note.valeur)" class="small">
+                  {{ getAppreciation(note.valeur) }}
+                </span>
+              </td>
+              <td class="text-muted small">
+                {{ note.periode || '-' }}
+              </td>
+              <td class="text-muted small">
+                {{ note.created_at | date:'dd/MM/yyyy' }}
+              </td>
+              <td class="pe-4">
+                <span [class]="getStatutClass(note.valeur)" class="badge">
+                  {{ note.valeur >= 10 ? 'Validé' : 'Non validé' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Message si aucune note -->
+      <div *ngIf="notesFiltrees.length === 0" class="text-center py-5">
+        <div class="text-muted">
+          <i class="bi bi-inbox display-4 d-block mb-3"></i>
+          <p class="h5">Aucune note trouvée</p>
+          <p class="text-muted">Aucune note ne correspond à vos critères de filtrage.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

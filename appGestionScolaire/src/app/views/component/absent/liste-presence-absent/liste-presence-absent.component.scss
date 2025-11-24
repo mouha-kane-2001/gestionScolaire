@@ -1,0 +1,28 @@
+.avatar {
+  transition: transform 0.2s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.1);
+}
+
+.btn-group .btn {
+  border-radius: 0.25rem !important;
+}
+
+.table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.badge {
+  font-size: 0.75rem;
+}
+
+.form-check-input:checked {
+  background-color: #198754;
+  border-color: #198754;
+}

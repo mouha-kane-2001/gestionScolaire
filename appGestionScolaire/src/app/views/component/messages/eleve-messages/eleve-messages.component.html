@@ -1,0 +1,411 @@
+<!-- eleve-messages.component.html -->
+<div class="messaging-app">
+  <!-- Header élégant -->
+  <div class="app-header">
+    <div class="header-content">
+      <div class="header-brand">
+        <div class="brand-icon">
+          <i class="bi bi-chat-heart-fill"></i>
+        </div>
+        <div class="brand-text">
+          <h1 class="app-title">Messagerie Éducative</h1>
+          <p class="app-subtitle">Communiquez avec vos professeurs</p>
+        </div>
+      </div>
+
+      <div class="header-stats">
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="bi bi-envelope-open"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-number">{{ messagesRecus.length }}</span>
+            <span class="stat-label">Messages reçus</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="bi bi-bell"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-number">{{ unreadCount }}</span>
+            <span class="stat-label">Non lus</span>
+          </div>
+        </div>
+        <button class="btn-refresh" (click)="refreshMessages()" title="Actualiser">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation élégante -->
+  <div class="tab-navigation">
+    <div class="tab-container">
+      <button class="tab-item"
+              [class.active]="currentSection === 'composer'"
+              (click)="currentSection = 'composer'">
+        <div class="tab-icon">
+          <i class="bi bi-pencil-square"></i>
+        </div>
+        <span>Nouveau Message</span>
+      </button>
+
+      <button class="tab-item"
+              [class.active]="currentSection === 'recus'"
+              (click)="currentSection = 'recus'">
+        <div class="tab-icon">
+          <i class="bi bi-inbox"></i>
+          <span *ngIf="unreadCount > 0" class="tab-badge">{{ unreadCount }}</span>
+        </div>
+        <span>Boîte de réception</span>
+      </button>
+
+      <button class="tab-item"
+              [class.active]="currentSection === 'envoyes'"
+              (click)="currentSection = 'envoyes'">
+        <div class="tab-icon">
+          <i class="bi bi-send-check"></i>
+        </div>
+        <span>Messages envoyés</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="app-content">
+    <!-- Section Composition -->
+    <section *ngIf="currentSection === 'composer'" class="composer-section">
+      <div class="composer-card">
+        <div class="card-header">
+          <div class="header-icon">
+            <i class="bi bi-pencil-square"></i>
+          </div>
+          <div class="header-text">
+            <h2 class="card-title">Nouveau Message</h2>
+            <p class="card-subtitle">Envoyez un message à votre professeur</p>
+          </div>
+        </div>
+
+        <form [formGroup]="messageForm" (ngSubmit)="envoyerMessage()" class="composer-form">
+          <!-- Sélection du professeur -->
+          <div class="form-section">
+            <div class="form-group">
+              <label class="form-label">
+                <i class="bi bi-person-lines-fill"></i>
+                Sélectionner un professeur
+              </label>
+              <div class="select-wrapper">
+                <select formControlName="prof_id" class="modern-select">
+                  <option value="" disabled selected>👨‍🏫 Choisir un enseignant...</option>
+                  <option *ngFor="let prof of professeurs" [value]="prof.user_id">
+                    {{ prof.user.prenom }} {{ prof.user.nom }} - {{ prof.matiere.nom }}
+                  </option>
+                </select>
+
+
+                <i class="bi bi-chevron-down select-arrow"></i>
+              </div>
+              <div class="error-message" *ngIf="messageForm.get('destinataire_id')?.invalid && messageForm.get('destinataire_id')?.touched">
+                <i class="bi bi-exclamation-circle"></i>
+                Veuillez sélectionner un professeur
+              </div>
+            </div>
+          </div>
+
+          <!-- Détails du message -->
+          <div class="form-section">
+            <div class="form-group full-width">
+              <label class="form-label">
+                <i class="bi bi-chat-square-text"></i>
+                Objet du message
+              </label>
+              <input type="text"
+                     formControlName="objet"
+                     class="modern-input"
+                     placeholder="Saisissez l'objet de votre message...">
+              <div class="error-message" *ngIf="messageForm.get('objet')?.invalid && messageForm.get('objet')?.touched">
+                <i class="bi bi-exclamation-circle"></i>
+                <span *ngIf="messageForm.get('objet')?.errors?.['required']">L'objet est obligatoire</span>
+                <span *ngIf="messageForm.get('objet')?.errors?.['minlength']">L'objet doit faire au moins 3 caractères</span>
+              </div>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">
+                <i class="bi bi-chat-left-text"></i>
+                Message
+              </label>
+              <div class="textarea-container">
+                <textarea formControlName="contenu"
+                          rows="6"
+                          class="modern-textarea"
+                          placeholder="Rédigez votre message ici..."></textarea>
+                <div class="textarea-footer">
+                  <div class="char-counter">
+                    {{ messageForm.get('contenu')?.value?.length || 0 }}/500 caractères
+                  </div>
+                  <div class="help-text">
+                    <i class="bi bi-info-circle"></i>
+                    Soyez précis dans votre demande
+                  </div>
+                </div>
+              </div>
+              <div class="error-message" *ngIf="messageForm.get('contenu')?.invalid && messageForm.get('contenu')?.touched">
+                <i class="bi bi-exclamation-circle"></i>
+                <span *ngIf="messageForm.get('contenu')?.errors?.['required']">Le message est obligatoire</span>
+                <span *ngIf="messageForm.get('contenu')?.errors?.['minlength']">Le message doit faire au moins 10 caractères</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="resetForm()">
+              <i class="bi bi-x-circle"></i>
+              Annuler
+            </button>
+            <button type="submit"
+                    class="btn btn-primary"
+                    [disabled]="messageForm.invalid">
+              <i class="bi bi-send-fill"></i>
+              Envoyer le message
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Section Messages Reçus -->
+    <section *ngIf="currentSection === 'recus'" class="messages-section">
+      <div class="messages-header">
+        <div class="header-content">
+          <div class="header-icon">
+            <i class="bi bi-inbox"></i>
+          </div>
+          <div class="header-text">
+            <h2 class="section-title">Boîte de réception</h2>
+            <div class="messages-stats">
+              <span class="stat-text">{{ filteredMessages.length }} message(s)</span>
+              <span *ngIf="unreadCount > 0" class="unread-stat">{{ unreadCount }} non lu(s)</span>
+            </div>
+          </div>
+        </div>
+        <div class="header-controls">
+          <div class="filter-control">
+            <select class="modern-select compact" (change)="filterMessages($event)">
+              <option value="all">Tous les messages</option>
+              <option value="unread">Non lus uniquement</option>
+              <option value="prof">Enseignants</option>
+            </select>
+          </div>
+          <div class="search-box">
+            <input type="text" class="modern-input compact" placeholder="Rechercher..."
+                   [formControl]="rechercheControl">
+          </div>
+        </div>
+      </div>
+
+      <div class="messages-list">
+        <!-- État vide -->
+        <div *ngIf="filteredMessages.length === 0" class="empty-state">
+          <div class="empty-icon">
+            <i class="bi bi-inbox"></i>
+          </div>
+          <h3>Aucun message</h3>
+          <p>Vous n'avez pas encore reçu de messages</p>
+          <button class="btn btn-primary" (click)="currentSection = 'composer'">
+            <i class="bi bi-pencil-square"></i>
+            Écrire un message
+          </button>
+        </div>
+
+        <!-- Liste des messages -->
+        <div *ngFor="let msg of filteredMessages"
+             class="message-card"
+             [class.unread]="msg.statut === 'non_lu'"
+             [class.selected]="selectedMessage?.id === msg.id"
+             (click)="selectMessage(msg)">
+
+          <div class="message-indicator" [ngClass]="'type-' + msg.type"></div>
+
+          <div class="message-content">
+            <div class="message-header">
+              <div class="message-sender">
+                <div class="sender-avatar prof">
+                  <i class="bi bi-person-badge"></i>
+                </div>
+                <div class="sender-info">
+                  <h4 class="sender-name">
+                    {{ getSenderName(msg) }}
+                  </h4>
+                  <div class="message-type-tag" [ngClass]="getTypeClass(msg)">
+                    {{ getTypeLabel(msg) }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="message-meta">
+                <div class="message-time">
+                  {{ msg.created_at | date:'dd/MM/yyyy à HH:mm' }}
+                </div>
+                <div class="message-status" [ngClass]="getStatusClass(msg)">
+                  {{ getStatusLabel(msg) }}
+                </div>
+              </div>
+            </div>
+
+            <div class="message-subject">
+              <h3 class="subject-text">{{ msg.objet || 'Sans objet' }}</h3>
+              <div class="message-actions">
+
+                <button class="action-btn reply"
+                        (click)="repondreMessage(msg); $event.stopPropagation()"
+                        title="Répondre">
+                  <i class="bi bi-reply"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="message-preview">
+              <p>{{ msg.contenu | truncate:120 }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Messages Envoyés -->
+    <section *ngIf="currentSection === 'envoyes'" class="messages-section">
+      <div class="messages-header">
+        <div class="header-content">
+          <div class="header-icon">
+            <i class="bi bi-send-check"></i>
+          </div>
+          <div class="header-text">
+            <h2 class="section-title">Messages envoyés</h2>
+            <div class="messages-stats">
+              <span class="stat-text">{{ messagesEnvoyes.length }} message(s) envoyé(s)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="messages-list">
+        <div *ngIf="messagesEnvoyes.length === 0" class="empty-state">
+          <div class="empty-icon">
+            <i class="bi bi-send"></i>
+          </div>
+          <h3>Aucun message envoyé</h3>
+          <p>Vous n'avez pas encore envoyé de messages</p>
+          <button class="btn btn-primary" (click)="currentSection = 'composer'">
+            <i class="bi bi-pencil-square"></i>
+            Écrire votre premier message
+          </button>
+        </div>
+
+        <div *ngFor="let msg of messagesEnvoyes"
+             class="message-card sent">
+          <div class="message-indicator sent"></div>
+
+          <div class="message-content">
+            <div class="message-header">
+              <div class="message-sender">
+                <div class="sender-avatar sent">
+                  <i class="bi bi-person-badge"></i>
+                </div>
+                <div class="sender-info">
+                  <h4 class="sender-name">À : {{ getRecipientName(msg) }}</h4>
+                  <div class="message-type-tag" [ngClass]="getTypeClass(msg)">
+                    {{ getTypeLabel(msg) }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="message-meta">
+                <div class="message-time">
+                  {{ msg.created_at | date:'dd/MM/yyyy à HH:mm' }}
+                </div>
+                <div class="sent-indicator">
+                  <i class="bi bi-check-circle-fill"></i>
+                  Envoyé
+                </div>
+              </div>
+            </div>
+
+            <div class="message-subject">
+              <h3 class="subject-text">{{ msg.objet || 'Sans objet' }}</h3>
+            </div>
+
+            <div class="message-preview">
+              <p>{{ msg.contenu | truncate:120 }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Modal de lecture de message -->
+<div *ngIf="selectedMessage" class="message-modal-overlay" (click)="closeMessageModal()">
+  <div class="message-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header" [ngClass]="'type-' + selectedMessage.type">
+      <div class="header-content">
+        <div class="message-type-badge">
+          <i class="bi" [ngClass]="{
+            'bi-envelope': selectedMessage.type === 'message',
+            'bi-megaphone': selectedMessage.type === 'annonce',
+            'bi-exclamation-triangle': selectedMessage.type === 'urgence'
+          }"></i>
+          <span>{{ getTypeLabel(selectedMessage) }}</span>
+        </div>
+
+        <h1 class="modal-title">{{ selectedMessage.objet || 'Sans objet' }}</h1>
+
+        <div class="message-quick-info">
+          <div class="info-item">
+            <i class="bi bi-person"></i>
+            <span>De: {{ getSenderName(selectedMessage) }}</span>
+          </div>
+          <div class="info-item">
+            <i class="bi bi-clock"></i>
+            <span>Le {{ selectedMessage.created_at | date:'dd/MM/yyyy à HH:mm' }}</span>
+          </div>
+          <div class="info-item" *ngIf="selectedMessage.priorite && selectedMessage.priorite !== 'normal'">
+            <i class="bi bi-flag"></i>
+            <span class="priority-tag" [ngClass]="selectedMessage.priorite">
+              {{ selectedMessage.priorite === 'haute' ? 'Priorité haute' : 'Urgent' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <button class="modal-close" (click)="closeMessageModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="message-content">
+        <div class="content-text">
+          {{ selectedMessage.contenu }}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="footer-actions">
+        <button class="btn btn-secondary" (click)="closeMessageModal()">
+          <i class="bi bi-x"></i>
+          Fermer
+        </button>
+        <button class="btn btn-primary" (click)="repondreMessage(selectedMessage)">
+          <i class="bi bi-reply"></i>
+          Répondre
+        </button>
+         
+      </div>
+    </div>
+  </div>
+</div>

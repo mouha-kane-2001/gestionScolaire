@@ -1,0 +1,98 @@
+.hover-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+.avatar-placeholder {
+  transition: transform 0.2s ease-in-out;
+}
+
+.hover-card:hover .avatar-placeholder {
+  transform: scale(1.1);
+}
+
+.date-badge {
+  min-width: 60px;
+  border: 1px solid #e9ecef;
+}
+
+.absence-item {
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0 -1rem 1rem -1rem;
+  }
+
+  &:last-child {
+    border-bottom: none !important;
+    margin-bottom: 0;
+  }
+}
+
+.comment-box {
+  background-color: #f8f9fa;
+  border-left: 3px solid #007bff;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+}
+
+.badge {
+  font-size: 0.75em;
+  padding: 0.35em 0.65em;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .absence-item {
+    .row > div {
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  .date-badge {
+    min-width: 50px;
+
+    div {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+// Animation pour le loading
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// Styles pour les statistiques
+.card.bg-primary,
+.card.bg-success,
+.card.bg-danger,
+.card.bg-warning {
+  border: none;
+
+  .card-body {
+    padding: 1.25rem;
+  }
+
+  i {
+    opacity: 0.8;
+  }
+}

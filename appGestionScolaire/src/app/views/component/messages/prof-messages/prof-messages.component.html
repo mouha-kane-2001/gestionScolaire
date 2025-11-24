@@ -1,0 +1,641 @@
+<div class="messaging-app">
+  <!-- Header principal -->
+  <div class="app-header">
+    <div class="header-content">
+      <div class="header-brand">
+        <div class="brand-icon">
+          <i class="bi bi-chat-dots-fill"></i>
+        </div>
+        <div class="brand-text">
+          <h1 class="app-title">Messagerie</h1>
+          <p class="app-subtitle">Communiquez avec votre communauté éducative</p>
+        </div>
+      </div>
+
+      <div class="header-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ unreadCount }}</span>
+          <span class="stat-label">Non lus</span>
+        </div>
+        <button class="btn-refresh" (click)="refreshMessages()" title="Actualiser">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation par onglets -->
+  <div class="tab-navigation">
+    <div class="tab-container">
+      <button class="tab-item"
+              [class.active]="currentSection === 'composer'"
+              (click)="currentSection = 'composer'">
+        <i class="bi bi-pencil-square"></i>
+        <span>Nouveau Message</span>
+      </button>
+
+      <button class="tab-item"
+              [class.active]="currentSection === 'recus'"
+              (click)="currentSection = 'recus'">
+        <i class="bi bi-inbox"></i>
+        <span>Boîte de réception</span>
+        <span *ngIf="unreadCount > 0" class="tab-badge">{{ unreadCount }}</span>
+      </button>
+
+      <button class="tab-item"
+              [class.active]="currentSection === 'envoyes'"
+              (click)="currentSection = 'envoyes'">
+        <i class="bi bi-send-check"></i>
+        <span>Messages envoyés</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="app-content">
+
+
+
+
+
+
+
+
+    <!-- Section Composition -->
+    <section *ngIf="currentSection === 'composer'" class="composer-section">
+      <div class="composer-card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <i class="bi bi-pencil-square"></i>
+            Nouveau Message
+          </h2>
+        </div>
+
+        <form [formGroup]="messageForm" (ngSubmit)="envoyerMessage()" class="composer-form">
+
+          <!-- Type de destinataire -->
+          <div class="form-section">
+            <label class="section-label">Destinataire</label>
+            <div class="recipient-type-selector">
+              <div class="type-options">
+                <label class="type-option" [class.active]="typeDestinataire === 'eleve'">
+                  <input type="radio" [(ngModel)]="typeDestinataire" value="eleve"
+                         [ngModelOptions]="{standalone: true}">
+                  <div class="option-content">
+                    <i class="bi bi-person"></i>
+                    <span>Élève/Parent</span>
+                  </div>
+                </label>
+
+                <label class="type-option" [class.active]="typeDestinataire === 'classe'">
+                  <input type="radio" [(ngModel)]="typeDestinataire" value="classe"
+                         [ngModelOptions]="{standalone: true}">
+                  <div class="option-content">
+                    <i class="bi bi-people"></i>
+                    <span>Classe</span>
+                  </div>
+                </label>
+
+                <label class="type-option" [class.active]="typeDestinataire === 'admin'">
+                  <input type="radio" [(ngModel)]="typeDestinataire" value="admin"
+                         [ngModelOptions]="{standalone: true}">
+                  <div class="option-content">
+                    <i class="bi bi-person-gear"></i>
+                    <span>Administrateur</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sélection du destinataire -->
+          <div class="form-section" *ngIf="typeDestinataire === 'eleve'">
+            <div class="recipient-selection">
+              <div class="selection-filters">
+                <div class="filter-group">
+                  <label class="filter-label">Filtrer par classe</label>
+                  <select class="modern-select" (change)="onClasseFilterChange($event)">
+                    <option value="">Toutes les classes</option>
+                    <option *ngFor="let c of classes" [value]="c.nom">{{ c.nom }}</option>
+                  </select>
+                </div>
+
+                <div *ngIf="classeFilter" class="selection-info">
+                  <span class="selection-count">{{ filteredEleves.length }} parent(s) sélectionnable(s)</span>
+                </div>
+              </div>
+
+              <div class="recipient-list">
+                <label class="form-label">Sélectionner le(s) destinataire(s)</label>
+                <div class="recipient-select-container">
+                  <select formControlName="destinataire_id"
+                          class="modern-select"
+                          [multiple]="!!classeFilter"
+                          [size]="classeFilter ? 4 : 1">
+                    <option value="" disabled [selected]="!classeFilter">
+                      {{ classeFilter ? 'Sélectionnez un ou plusieurs élèves' : 'Choisir un élève...' }}
+                    </option>
+                    <option *ngFor="let eleve of filteredEleves" [value]="eleve.id">
+                      {{ eleve.prenom }} {{ eleve.nom }} - {{ eleve.classe.nom }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sélection de classe -->
+          <div class="form-section" *ngIf="typeDestinataire === 'classe'">
+            <div class="form-group">
+              <label class="form-label">Sélectionner une classe</label>
+              <select formControlName="classe_id" class="modern-select">
+                <option value="" disabled selected>Choisir une classe...</option>
+                <option *ngFor="let c of classes" [value]="c.id">{{ c.nom }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Détails du message -->
+          <div class="form-section">
+            <div class="message-details-grid">
+              <div class="form-group">
+                <label class="form-label">Type de message</label>
+                <select formControlName="type" class="modern-select">
+                  <option value="message">📧 Message standard</option>
+                  <option value="annonce">📢 Annonce</option>
+                  <option value="urgence">🚨 Message urgent</option>
+                </select>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label">Objet</label>
+                <input type="text"
+                       formControlName="objet"
+                       class="modern-input"
+                       [placeholder]="getObjetPlaceholder()">
+              </div>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Contenu du message</label>
+              <div class="textarea-container">
+                <textarea formControlName="contenu"
+                          rows="6"
+                          class="modern-textarea"
+                          [placeholder]="getContenuPlaceholder()"></textarea>
+                <div class="textarea-footer">
+                  <div class="char-counter">
+                    {{ messageForm.get('contenu')?.value?.length || 0 }} caractères
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="resetForm()">
+              <i class="bi bi-x-circle"></i>
+              Annuler
+            </button>
+            <button type="submit"
+                    class="btn btn-primary"
+                    [disabled]="messageForm.invalid"
+                    [class.loading]="messageForm.invalid">
+              <i class="bi bi-send-fill"></i>
+              Envoyer le message
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+
+
+
+
+
+
+
+
+    <!-- Section Messages Reçus -->
+   <!-- Section Messages Reçus -->
+<section *ngIf="currentSection === 'recus'" class="messages-section">
+  <div class="modern-messages-header">
+    <div class="header-main">
+      <div class="header-title-section">
+        <div class="title-icon-wrapper">
+          <i class="bi bi-inbox-fill"></i>
+        </div>
+        <div class="title-content">
+          <h2 class="modern-section-title">Boîte de réception</h2>
+          <p class="section-subtitle">Gérez vos communications</p>
+        </div>
+      </div>
+
+      <div class="header-stats-wrapper">
+        <div class="stat-badge total">
+          <span class="stat-number">{{ messagesRecus.length }}</span>
+          <span class="stat-label">Total</span>
+        </div>
+        <div *ngIf="unreadCount > 0" class="stat-badge unread">
+          <span class="stat-number">{{ unreadCount }}</span>
+          <span class="stat-label">Non lus</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-controls-modern">
+      <div class="control-group">
+        <div class="filter-wrapper">
+          <i class="bi bi-funnel"></i>
+          <select class="modern-filter-select" (change)="filterMessages($event)">
+            <option value="all">Tous les messages</option>
+            <option value="unread">Non lus uniquement</option>
+            <option value="announcements">Annonces</option>
+            <option value="urgent">Urgents</option>
+          </select>
+        </div>
+
+        <button class="refresh-btn" (click)="refreshMessages()" title="Actualiser">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modern-messages-list">
+    <!-- État vide -->
+    <div *ngIf="filteredMessages.length === 0" class="modern-empty-state">
+      <div class="empty-illustration">
+        <i class="bi bi-inbox"></i>
+      </div>
+      <h3 class="empty-title">Aucun message</h3>
+      <p class="empty-description">Votre boîte de réception est vide pour le moment</p>
+      <button class="btn btn-gradient" (click)="currentSection = 'composer'">
+        <i class="bi bi-pencil-square"></i>
+        Écrire un message
+      </button>
+    </div>
+
+    <!-- Liste des messages -->
+    <div *ngFor="let msg of filteredMessages"
+         class="modern-message-card"
+         [class.unread]="msg.statut === 'non_lu'"
+         [class.selected]="selectedMessage?.id === msg.id"
+         [class.urgent]="msg.type === 'urgence'"
+         (click)="selectMessage(msg)">
+
+      <div class="message-avatar" [ngClass]="getAvatarClass(msg?.expediteur_type || '')">
+  <i [class]="getAvatarIcon(msg?.expediteur_type || '')"></i>
+</div>
+
+      <div class="message-main-content">
+        <div class="message-header-modern">
+          <div class="sender-info-modern">
+            <h4 class="sender-name-modern">
+              {{ getExpediteurName(msg.expediteur_id) }}
+            </h4>
+            <div class="message-badges">
+              <span class="type-badge" [ngClass]="'type-' + msg.type">
+                {{ getTypeLabel(msg.type) }}
+              </span>
+              <span *ngIf="msg.priorite" class="priority-badge" [ngClass]="msg.priorite">
+                {{ msg.priorite }}
+              </span>
+            </div>
+          </div>
+
+          <div class="message-time-modern">
+            {{ msg.created_at | date:'dd/MM/yyyy' }}
+            <span class="time">{{ msg.created_at | date:'HH:mm' }}</span>
+          </div>
+        </div>
+
+        <div class="message-body-modern">
+          <h3 class="message-subject-modern">{{ msg.objet || 'Sans objet' }}</h3>
+          <p class="message-preview-modern">
+            {{ msg.contenu | truncate:120 }}
+          </p>
+        </div>
+
+        <div class="message-footer">
+          <div class="message-meta-modern">
+            <span class="meta-item">
+              <i class="bi bi-clock"></i>
+              {{ msg.created_at | date:'HH:mm' }}
+            </span>
+            <span *ngIf="msg.statut === 'non_lu'" class="unread-indicator">
+              <i class="bi bi-circle-fill"></i>
+              Non lu
+            </span>
+          </div>
+
+          <div class="message-actions-modern">
+
+            <button class="action-btn-modern reply"
+                    (click)="repondreMessage(msg); $event.stopPropagation()"
+                    title="Répondre">
+              <i class="bi bi-reply"></i>
+            </button>
+            <button class="action-btn-modern view"
+                    (click)="selectMessage(msg); $event.stopPropagation()"
+                    title="Voir le message">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <!-- Section Messages Envoyés -->
+   <!-- Section Messages Envoyés -->
+<section *ngIf="currentSection === 'envoyes'" class="messages-section">
+  <div class="modern-messages-header">
+    <div class="header-main">
+      <div class="header-title-section">
+        <div class="title-icon-wrapper sent">
+          <i class="bi bi-send-check-fill"></i>
+        </div>
+        <div class="title-content">
+          <h2 class="modern-section-title">Messages envoyés</h2>
+          <p class="section-subtitle">Historique de vos communications</p>
+        </div>
+      </div>
+
+      <div class="header-stats-wrapper">
+        <div class="stat-badge total-sent">
+          <span class="stat-number">{{ messagesEnvoyes.length }}</span>
+          <span class="stat-label">Envoyés</span>
+        </div>
+        <div class="stat-badge success-rate">
+          <span class="stat-number">{{ getSuccessRate() }}%</span>
+          <span class="stat-label">Succès</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-controls-modern">
+      <div class="control-group">
+        <div class="filter-wrapper">
+          <i class="bi bi-funnel"></i>
+          <select class="modern-filter-select" (change)="filterSentMessages($event)">
+            <option value="all">Tous les messages</option>
+            <option value="recent">7 derniers jours</option>
+            <option value="month">Ce mois-ci</option>
+            <option value="annonces">Annonces</option>
+            <option value="urgent">Urgents</option>
+          </select>
+        </div>
+
+        <button class="refresh-btn" (click)="refreshMessages()" title="Actualiser">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modern-messages-list">
+    <!-- État vide -->
+    <div *ngIf="messagesEnvoyes.length === 0" class="modern-empty-state sent">
+      <div class="empty-illustration">
+        <i class="bi bi-send"></i>
+      </div>
+      <h3 class="empty-title">Aucun message envoyé</h3>
+      <p class="empty-description">Vous n'avez pas encore envoyé de messages</p>
+      <button class="btn btn-gradient" (click)="currentSection = 'composer'">
+        <i class="bi bi-pencil-square"></i>
+        Écrire votre premier message
+      </button>
+    </div>
+
+    <!-- Liste des messages envoyés -->
+    <div *ngFor="let msg of filteredMessages"
+         class="modern-message-card sent"
+         [class.selected]="selectedMessage?.id === msg.id"
+         [class.urgent]="msg.type === 'urgence'"
+         (click)="selectMessage(msg)">
+
+      <div class="message-avatar sent">
+        <i class="bi bi-send-fill"></i>
+      </div>
+
+      <div class="message-main-content">
+        <div class="message-header-modern">
+          <div class="sender-info-modern">
+            <h4 class="sender-name-modern">
+              À: {{ getDestinataireInfo(msg) }}
+            </h4>
+            <div class="message-badges">
+              <span class="type-badge" [ngClass]="'type-' + msg.type">
+                {{ getTypeLabel(msg.type) }}
+              </span>
+              <span *ngIf="msg.priorite" class="priority-badge" [ngClass]="msg.priorite">
+                {{ msg.priorite }}
+              </span>
+              <span class="sent-badge">
+                <i class="bi bi-check2-all"></i>
+                Envoyé
+              </span>
+            </div>
+          </div>
+
+          <div class="message-time-modern">
+            {{ msg.created_at | date:'dd/MM/yyyy' }}
+            <span class="time">{{ msg.created_at | date:'HH:mm' }}</span>
+          </div>
+        </div>
+
+        <div class="message-body-modern">
+          <h3 class="message-subject-modern">{{ msg.objet || 'Sans objet' }}</h3>
+          <p class="message-preview-modern">
+            {{ msg.contenu | truncate:120 }}
+          </p>
+        </div>
+
+        <div class="message-footer">
+          <div class="message-meta-modern">
+            <span class="meta-item">
+              <i class="bi bi-clock"></i>
+              {{ msg.created_at | date:'HH:mm' }}
+            </span>
+            <span class="meta-item">
+              <i class="bi bi-people"></i>
+              {{ getDestinataireCount(msg) }} destinataire(s)
+            </span>
+            <span *ngIf="isMessageRead(msg)" class="read-indicator">
+              <i class="bi bi-eye-fill"></i>
+              Lu
+            </span>
+          </div>
+
+          <div class="message-actions-modern">
+            <button class="action-btn-modern view"
+                    (click)="selectMessage(msg); $event.stopPropagation()"
+                    title="Voir le message">
+              <i class="bi bi-eye"></i>
+            </button>
+            <button class="action-btn-modern resend"
+                    (click)="resendMessage(msg); $event.stopPropagation()"
+                    title="Renvoyer">
+              <i class="bi bi-arrow-repeat"></i>
+            </button>
+            <button class="action-btn-modern stats"
+                    (click)="showMessageStats(msg); $event.stopPropagation()"
+                    title="Statistiques">
+              <i class="bi bi-graph-up"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  </div>
+</div>
+
+<!-- Modal de lecture de message -->
+<!-- Modal de lecture de message -->
+<div *ngIf="selectedMessage" class="modern-modal-overlay" (click)="closeMessageModal()">
+  <div class="modern-modal" (click)="$event.stopPropagation()">
+
+    <!-- Header avec gradient dynamique -->
+    <div class="modern-modal-header" [ngClass]="'type-' + selectedMessage.type">
+      <div class="header-background"></div>
+      <div class="header-content">
+
+        <!-- Informations type et date -->
+        <div class="message-header-info">
+          <div class="message-type-indicator">
+            <div class="type-icon">
+              <i class="bi" [ngClass]="{
+                'bi-envelope': selectedMessage.type === 'message',
+                'bi-megaphone': selectedMessage.type === 'annonce',
+                'bi-exclamation-triangle': selectedMessage.type === 'urgence'
+              }"></i>
+            </div>
+            <div class="type-info">
+              <span class="type-label">{{ getTypeLabel(selectedMessage.type) }}</span>
+              <span class="message-date">{{ selectedMessage.created_at | date:'dd MMMM yyyy à HH:mm' }}</span>
+            </div>
+          </div>
+
+
+        </div>
+
+        <!-- Titre du message -->
+        <h1 class="modern-modal-title">{{ selectedMessage.objet || 'Sans objet' }}</h1>
+
+        <!-- Informations rapides -->
+        <div class="message-quick-info">
+          <div class="info-item">
+            <i class="bi bi-person"></i>
+            <span>{{ getExpediteurName(selectedMessage.expediteur_id) }}</span>
+          </div>
+
+          <div class="info-item" *ngIf="selectedMessage.priorite">
+            <i class="bi bi-flag"></i>
+            <span class="priority-tag" [ngClass]="selectedMessage.priorite">
+              {{ selectedMessage.priorite }}
+            </span>
+          </div>
+
+          <div class="info-item" *ngIf="selectedMessage.statut === 'non_lu'">
+            <i class="bi bi-circle-fill"></i>
+            <span class="unread-badge">Non lu</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Corps du message -->
+    <div class="modern-modal-body">
+
+      <!-- Section contenu du message -->
+      <div class="message-content-section">
+        <div class="section-header">
+          <h3>Contenu du message</h3>
+          <div class="message-stats">
+            <span class="char-count">{{ selectedMessage.contenu.length }} caractères</span>
+          </div>
+        </div>
+
+        <div class="message-text-content">
+          <div class="text-scroll-container">
+            <p>{{ selectedMessage.contenu }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section métadonnées -->
+      <div class="metadata-section">
+        <h3>Informations du message</h3>
+        <div class="metadata-grid">
+          <div class="metadata-card">
+            <div class="metadata-icon">
+              <i class="bi bi-person"></i>
+            </div>
+            <div class="metadata-content">
+              <label>Expéditeur</label>
+              <span class="metadata-value">{{ getExpediteurName(selectedMessage.expediteur_id ) }}</span>
+              <span class="metadata-subtext">{{ selectedMessage.expediteur_type }}</span>
+            </div>
+          </div>
+
+          <div class="metadata-card">
+            <div class="metadata-icon">
+              <i class="bi bi-calendar"></i>
+            </div>
+            <div class="metadata-content">
+              <label>Date d'envoi</label>
+              <span class="metadata-value">{{ selectedMessage.created_at | date:'dd/MM/yyyy' }}</span>
+              <span class="metadata-subtext">{{ selectedMessage.created_at | date:'HH:mm' }}</span>
+            </div>
+          </div>
+
+          <div class="metadata-card">
+            <div class="metadata-icon">
+              <i class="bi bi-tag"></i>
+            </div>
+            <div class="metadata-content">
+              <label>Type</label>
+              <span class="type-tag" [ngClass]="'bg-' + getTypeClass(selectedMessage.type)">
+                {{ getTypeLabel(selectedMessage.type) }}
+              </span>
+            </div>
+          </div>
+
+          <div class="metadata-card" *ngIf="selectedMessage.priorite">
+            <div class="metadata-icon">
+              <i class="bi bi-flag"></i>
+            </div>
+            <div class="metadata-content">
+              <label>Priorité</label>
+              <span class="priority-tag" [ngClass]="selectedMessage.priorite">
+                {{ selectedMessage.priorite }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer avec actions -->
+    <div class="modern-modal-footer">
+      <div class="footer-actions">
+        <button class="btn btn-secondary" (click)="closeMessageModal()">
+          <i class="bi bi-x"></i>
+          Fermer
+        </button>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,9 @@
 {
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.1.0"
+    "@fortawesome/fontawesome-free": "^7.1.0",
+    "..." : "..."  
+  },
+  "scripts": {
+    "build": "ng build --configuration production" 
   }
 }

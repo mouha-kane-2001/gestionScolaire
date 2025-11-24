@@ -1,0 +1,138 @@
+<!-- Dans parent-consultenotes.component.html -->
+<div class="container mt-4">
+  <!-- Liste des enfants -->
+  <div *ngIf="!selectedEnfant">
+    <h3>Mes Enfants</h3>
+
+    <div *ngIf="loading.enfants" class="text-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+      <p>Chargement des enfants...</p>
+    </div>
+
+    <div *ngIf="!loading.enfants && enfants.length === 0" class="alert alert-info">
+      Aucun enfant trouvé.
+    </div>
+
+    <div class="row">
+      <div *ngFor="let enfant of enfants" class="col-md-4 mb-3">
+        <div class="card">
+          <div class="card-body text-center">
+            <h5 class="card-title">{{ enfant.user?.prenom }} {{ enfant.user?.nom }} </h5>
+            <p class="card-text">{{ enfant.classe?.nom || 'Classe non définie' }}</p>
+            <button class="btn btn-primary" (click)="voirNotes(enfant)">
+              Voir les notes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes de l'enfant sélectionné -->
+  <div *ngIf="selectedEnfant">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3>
+        Notes de {{ selectedEnfant.prenom }} {{ selectedEnfant.nom }}
+      </h3>
+      <button class="btn btn-secondary" (click)="retour()">
+        ← Retour à la liste
+      </button>
+    </div>
+
+    <div *ngIf="loading.notes" class="text-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+      <p>Chargement des notes...</p>
+    </div>
+
+    <div *ngIf="!loading.notes">
+      <!-- Filtres et statistiques -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Filtres</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Matière</label>
+                  <select class="form-select" [(ngModel)]="filtreMatiere" (change)="filtrerNotes()">
+                    <option value="">Toutes les matières</option>
+                    <option *ngFor="let matiere of matieresUniques" [value]="matiere">
+                      {{ matiere }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Type</label>
+                  <select class="form-select" [(ngModel)]="filtreType" (change)="filtrerNotes()">
+                    <option value="">Tous les types</option>
+                    <option value="examen">Examen</option>
+                    <option value="devoir">Devoir</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-outline-secondary mt-2" (click)="reinitialiserFiltres()">
+                Réinitialiser
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Statistiques</h5>
+              <div class="row text-center">
+                <div class="col-4">
+                  <div class="h4 text-primary">{{ calculerMoyenne() }}/20</div>
+                  <small>Moyenne</small>
+                </div>
+                <div class="col-4">
+                  <div class="h4 text-success">{{ countNotesSup10() }}</div>
+                  <small>Notes ≥ 10</small>
+                </div>
+                <div class="col-4">
+                  <div class="h4 text-danger">{{ countNotesInf10() }}</div>
+                  <small>Notes < 10</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liste des notes -->
+      <div *ngIf="notesFiltrees.length === 0" class="alert alert-warning">
+        Aucune note trouvée avec les filtres actuels.
+      </div>
+
+      <div *ngFor="let note of notesFiltrees" class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h5 class="card-title">{{ note.matiere?.nom || 'Matière inconnue' }}</h5>
+              <span [class]="getBadgeClass(note.type)" class="me-2">
+                {{ note.type }}
+              </span>
+              <small class="text-muted">{{ note.periode }}</small>
+              <p *ngIf="note.commentaire" class="mt-2 mb-0">
+                {{ note.commentaire }}
+              </p>
+            </div>
+            <div class="text-end">
+              <div class="h3 mb-1" [class]="getAppreciationClass(note.valeur)">
+                {{ note.valeur }}/20
+              </div>
+              <small [class]="getAppreciationClass(note.valeur)">
+                {{ getAppreciation(note.valeur) }}
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

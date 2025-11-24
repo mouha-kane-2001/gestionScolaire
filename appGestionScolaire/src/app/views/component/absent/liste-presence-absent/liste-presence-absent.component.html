@@ -1,0 +1,270 @@
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+
+      <!-- En-tête avec date et actions -->
+      <div class="card shadow-sm border-0 mb-4" style="background: linear-gradient(135deg, #ebeced 0%, #3bbad6 100%);" >
+        <div class="card-body py-3 text-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <div style="color: rgb(31, 100, 100);">
+              <h4 class="mb-1 fw-bold">
+                <i class="bi bi-clipboard-check me-2"></i>
+                Gestion des présences
+              </h4>
+              <small class="opacity-75">{{ today | date:'EEEE dd MMMM yyyy' | titlecase }}</small>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+              <div class="bg-white   bg-opacity-20 rounded px-3 py-1">
+                <select
+                  class="form-select form-select-sm border-0 bg-transparent text-dark"
+                  (change)="onClasseChange($event)"
+                  [value]="classeSelectionnee"
+                  style="min-width: 180px;">
+                  <option value="" class="text-dark"  >Sélectionnez une classe</option>
+                  <option *ngFor="let classe of classes" [value]="classe.id" class="text-dark" >
+                    {{ classe.nom }}
+                  </option>
+                </select>
+              </div>
+
+              <button class="btn btn-light btn-sm text-dark" (click)="reinitialiserTout()" title="Réinitialiser">
+                <i class="bi bi-arrow-repeat"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liste des élèves avec marquage rapide -->
+      <div class="card shadow-sm border-0" *ngIf="classeSelectionnee">
+        <div class="card-header bg-white border-0 py-3">
+          <div class="row align-items-center">
+            <div class="col">
+              <h6 class="mb-0 fw-semibold text-dark">
+                <i class="bi bi-list-check me-2 text-primary"></i>
+                Liste des élèves
+              </h6>
+            </div>
+            <div class="col-auto">
+              <div class="d-flex gap-2 text-sm">
+                <span class="badge bg-success bg-opacity-10 text-success">
+                  <i class="bi bi-check-circle me-1"></i>{{ countPresents }} Présent(s)
+                </span>
+                <span class="badge bg-danger bg-opacity-10 text-danger">
+                  <i class="bi bi-x-circle me-1"></i>{{ countAbsents }} Absent(s)
+                </span>
+                <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                  <i class="bi bi-dash-circle me-1"></i>{{ countNonMarques }} Non marqué(s)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-4 py-3 border-0" style="width: 35%">Élève</th>
+                  <th class="py-3 border-0" style="width: 15%">Classe</th>
+                  <th class="text-center py-3 border-0" style="width: 20%">Statut</th>
+                  <th class="text-center py-3 border-0" style="width: 20%">Actions</th>
+                  <th class="text-center py-3 border-0" style="width: 10%">Justifié</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let eleve of elevesFiltres" class="border-top">
+                  <!-- Info élève -->
+                  <td class="ps-4">
+                    <div class="d-flex align-items-center">
+                      <div class="avatar bg-gradient-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm"
+                           style="width: 42px; height: 42px; font-size: 0.9rem; font-weight: 600;">
+                        {{ eleve.prenom.charAt(0) }}{{ eleve.nom.charAt(0) }}
+                      </div>
+                      <div>
+                        <div class="fw-semibold text-dark">{{ eleve.prenom }} {{ eleve.nom }}</div>
+                        <small class="text-muted">Matricule: {{ eleve.matricule }}</small>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Classe -->
+                  <td>
+                    <span class="badge bg-light text-dark border px-3 py-2">
+                      <i class="bi bi-mortarboard me-1 text-primary"></i>
+                      {{ getNomClasse(eleve.classe_id) }}
+                    </span>
+                  </td>
+
+                  <!-- Statut -->
+                  <td class="text-center">
+                    <!-- Présent -->
+                    <span *ngIf="estPresent(eleve.id)"
+                          class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2">
+                      <i class="bi bi-check-circle-fill me-1"></i>Présent
+                    </span>
+
+                    <!-- Absent -->
+                    <span *ngIf="estAbsent(eleve.id)"
+                          [class]="'badge px-3 py-2 border ' +
+                          (estJustifie(eleve.id) ?
+                           'bg-warning bg-opacity-10 text-warning border-warning border-opacity-25' :
+                           'bg-danger bg-opacity-10 text-danger border-danger border-opacity-25')">
+                      <i class="bi bi-x-circle-fill me-1"></i>
+                      {{ getMotifAbsence(eleve.id) }}
+                      <span *ngIf="estJustifie(eleve.id)" class="ms-1">(Justifié)</span>
+                    </span>
+
+                    <!-- Non marqué -->
+                    <span *ngIf="!estPresent(eleve.id) && !estAbsent(eleve.id)"
+                          class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2">
+                      <i class="bi bi-dash-circle me-1"></i>En attente
+                    </span>
+                  </td>
+
+                  <!-- Actions rapides -->
+                  <td class="text-center">
+                    <div class="d-flex justify-content-center gap-2">
+                      <!-- Présent -->
+                      <button
+                        type="button"
+                        class="btn btn-sm px-3"
+                        [class]="estPresent(eleve.id) ?
+                                'btn-success' :
+                                'btn-outline-success'"
+                        (click)="marquerPresent(eleve)"
+                        [disabled]="estPresent(eleve.id) || estEnCoursDeSauvegarde(eleve.id)"
+                        title="Marquer présent">
+                        <i class="bi bi-check-lg"></i>
+                      </button>
+
+                      <!-- Absent simple -->
+                      <button
+                        type="button"
+                        class="btn btn-sm px-3"
+                        [class]="estAbsent(eleve.id) && getMotifAbsence(eleve.id) === 'Absent' ?
+                                'btn-danger' :
+                                'btn-outline-danger'"
+                        (click)="marquerAbsentRapide(eleve, 'absent')"
+                        [disabled]="estAbsent(eleve.id) || estEnCoursDeSauvegarde(eleve.id)"
+                        title="Marquer absent">
+                        <i class="bi bi-x"></i>
+                      </button>
+
+                      <!-- Retard -->
+                      <button
+                        type="button"
+                        class="btn btn-sm px-3"
+                        [class]="estAbsent(eleve.id) && getMotifAbsence(eleve.id) === 'Retard' ?
+                                'btn-warning' :
+                                'btn-outline-warning'"
+                        (click)="marquerAbsentRapide(eleve, 'retard')"
+                        [disabled]="estAbsent(eleve.id) || estEnCoursDeSauvegarde(eleve.id)"
+                        title="Marquer retard">
+                        <i class="bi bi-clock"></i>
+                      </button>
+
+                      <!-- Autres motifs -->
+                      <div class="dropdown" *ngIf="!estAbsent(eleve.id)">
+                        <button class="btn btn-outline-secondary btn-sm px-3 dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown"
+                                [disabled]="estEnCoursDeSauvegarde(eleve.id)"
+                                title="Autres motifs">
+                          <i class="bi bi-three-dots"></i>
+                        </button>
+                        <ul class="dropdown-menu shadow border-0">
+                          <li *ngFor="let motif of autresMotifs">
+                            <a class="dropdown-item py-2" href="javascript:void(0)"
+                               (click)="marquerAbsentRapide(eleve, motif.value)">
+                              <i [class]="motif.icon + ' me-2 text-' + motif.color"></i>
+                              {{ motif.label }}
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+
+                      <!-- Indicateur de sauvegarde -->
+                      <div *ngIf="estEnCoursDeSauvegarde(eleve.id)" class="d-flex align-items-center">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                          <span class="visually-hidden">Chargement...</span>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Case à cocher justifié -->
+                  <td class="text-center">
+                    <div class="form-check form-switch d-inline-block">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        [checked]="estJustifie(eleve.id)"
+                        (change)="toggleJustifie(eleve.id)"
+                        [disabled]="!estAbsent(eleve.id) || estEnCoursDeSauvegarde(eleve.id)">
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Message si aucun élève dans la classe sélectionnée -->
+                <tr *ngIf="elevesFiltres.length === 0 && classeSelectionnee">
+                  <td colspan="5" class="text-center py-5">
+                    <div class="text-muted">
+                      <i class="bi bi-people display-4 opacity-50 d-block mb-3"></i>
+                      <h5 class="fw-semibold">Aucun élève dans cette classe</h5>
+                      <p class="mb-0">Aucun élève n'est inscrit dans la classe sélectionnée.</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions globales -->
+      <div class="card shadow-sm border-0 mt-4" *ngIf="classeSelectionnee && elevesFiltres.length > 0">
+        <div class="card-body py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="text-muted">
+              <small>
+                <i class="bi bi-info-circle me-1"></i>
+                Total: <strong class="text-dark">{{ elevesFiltres.length }}</strong> élève(s) |
+                Présents: <strong class="text-success">{{ countPresents }}</strong> |
+                Absents: <strong class="text-danger">{{ countAbsents }}</strong> |
+                Non marqués: <strong class="text-secondary">{{ countNonMarques }}</strong>
+              </small>
+            </div>
+            <div class="d-flex gap-3">
+              <button class="btn btn-outline-success px-4"
+                      (click)="marquerTousPresents()"
+                      [disabled]="loading || countAbsents === 0">
+                <i class="bi bi-check-all me-2"></i>
+                Tout marquer présent
+              </button>
+              <button class="btn btn-outline-warning px-4"
+                      (click)="sauvegarderPresences()"
+                      [disabled]="loading">
+                <i class="bi bi-cloud-arrow-up me-2"></i>
+                {{ loading ? 'Synchronisation...' : 'Sauvegarder' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message quand aucune classe n'est sélectionnée -->
+      <div class="card shadow-sm border-0" *ngIf="!classeSelectionnee">
+        <div class="card-body text-center py-5">
+          <div class="text-muted">
+            <i class="bi bi-folder-plus display-4 d-block mb-3 opacity-50"></i>
+            <h5 class="fw-semibold">Sélectionnez une classe</h5>
+            <p class="mb-0">Veuillez choisir une classe dans la liste déroulante pour afficher les élèves.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

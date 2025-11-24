@@ -1,0 +1,277 @@
+<div class="attribution-note-container">
+  <!-- En-tête élégant -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="bi bi-journal-check"></i>
+      </div>
+      <div class="header-text">
+        <h1 class="page-title">Attribution de Notes</h1>
+        <p class="page-subtitle">Gérez l'évaluation des élèves de manière simple et efficace</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="reinitialiserFormulaire()" style="color:black ;">
+        <i class="bi bi-plus-circle"></i>
+        Nouvelle Note
+      </button>
+    </div>
+  </div>
+
+  <!-- Carte principale du formulaire -->
+  <div class="form-card">
+    <form [formGroup]="noteForm" (ngSubmit)="onSubmit()" class="note-form">
+
+      <!-- Section Filtre Classe -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="bi bi-funnel"></i>
+          <h3>Filtre de Classe</h3>
+        </div>
+        <div class="filter-card">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-people-fill"></i>
+              Classe *
+            </label>
+            <select
+              formControlName="classe_id"
+              class="modern-select"
+              (change)="onClasseChange($event)"
+              [class.error]="f['classe_id'].touched && f['classe_id'].invalid">
+              <option value="" disabled selected>🏫 Sélectionner une classe</option>
+              <option *ngFor="let classe of classes" [value]="classe.id">
+                {{ classe.nom }}
+              </option>
+            </select>
+            <div class="error-message" *ngIf="f['classe_id'].touched && f['classe_id'].invalid">
+              <i class="bi bi-exclamation-circle"></i>
+              Veuillez sélectionner une classe
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Informations Élève et Matière -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="bi bi-person-lines-fill"></i>
+          <h3>Informations de l'Élève</h3>
+        </div>
+
+        <div class="form-grid">
+          <!-- Sélection Élève -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-person-circle"></i>
+              Élève *
+            </label>
+            <div class="select-wrapper">
+              <select
+                formControlName="eleve_id"
+                class="modern-select"
+                [class.error]="f['eleve_id'].touched && f['eleve_id'].invalid"
+                [class.disabled]="!f['classe_id'].value">
+                <option value="" disabled selected>👨‍🎓 Choisir un élève</option>
+                <option
+                  *ngFor="let eleve of filteredEleves"
+                  [value]="eleve.id">
+                  {{ eleve.prenom }} {{ eleve.nom | uppercase }} - {{ eleve.matricule }}
+                </option>
+              </select>
+              <i class="bi bi-chevron-down select-arrow"></i>
+            </div>
+
+            <div class="field-info">
+              <div *ngIf="!f['classe_id'].value" class="info-hint">
+                <i class="bi bi-info-circle"></i>
+                Veuillez d'abord sélectionner une classe
+              </div>
+              <div *ngIf="f['classe_id'].value && filteredEleves.length === 0" class="info-hint">
+                <i class="bi bi-exclamation-triangle"></i>
+                Aucun élève trouvé dans cette classe
+              </div>
+              <div *ngIf="filteredEleves.length > 0" class="info-hint success">
+                <i class="bi bi-check-circle"></i>
+                {{ filteredEleves.length }} élève(s) disponible(s)
+              </div>
+            </div>
+
+            <div class="error-message" *ngIf="f['eleve_id'].touched && f['eleve_id'].invalid">
+              <i class="bi bi-exclamation-circle"></i>
+              Veuillez sélectionner un élève
+            </div>
+          </div>
+
+          <!-- Sélection Matière -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-journal-text"></i>
+              Matière *
+            </label>
+            <div class="select-wrapper">
+              <select
+                formControlName="matiere_id"
+                class="modern-select readonly-select"
+                [class.error]="f['matiere_id'].touched && f['matiere_id'].invalid">
+                <option value="" disabled selected>📚 Sélectionner une matière</option>
+                <option
+                  *ngFor="let matiere of matieres"
+                  [value]="matiere.id">
+                  {{ matiere.nom }}
+                </option>
+              </select>
+              <i class="bi bi-chevron-down select-arrow"></i>
+            </div>
+            <div class="error-message" *ngIf="f['matiere_id'].touched && f['matiere_id'].invalid">
+              <i class="bi bi-exclamation-circle"></i>
+              Veuillez sélectionner une matière
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Paramètres d'Évaluation -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="bi bi-gear-fill"></i>
+          <h3>Paramètres d'Évaluation</h3>
+        </div>
+
+        <div class="form-grid">
+          <!-- Type d'évaluation -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-clipboard-check"></i>
+              Type d'évaluation *
+            </label>
+            <select
+              formControlName="type"
+              class="modern-select">
+              <option *ngFor="let type of typesNote" [value]="type.value">
+                {{ type.label }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Période -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-calendar-event"></i>
+              Période *
+            </label>
+            <select
+              formControlName="periode"
+              class="modern-select">
+              <option *ngFor="let periode of periodes" [value]="periode.value">
+                {{ periode.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Note et Appréciation -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="bi bi-star-fill"></i>
+          <h3>Note et Appréciation</h3>
+        </div>
+
+        <div class="note-section-grid">
+          <!-- Input Note -->
+          <div class="note-input-group">
+            <label class="form-label">
+              <i class="bi bi-pencil-square"></i>
+              Note sur 20 *
+            </label>
+            <div class="note-input-container">
+              <input
+                type="number"
+                formControlName="valeur"
+                class="note-input"
+                placeholder="0.00 - 20.00"
+                min="0"
+                max="20"
+                step="0.25"
+                (input)="onValeurChange($event)"
+                [class.error]="f['valeur'].touched && f['valeur'].invalid">
+              <span class="note-suffix">/20</span>
+            </div>
+
+            <div class="error-message" *ngIf="f['valeur'].touched && f['valeur'].invalid">
+              <i class="bi bi-exclamation-circle"></i>
+              <div *ngIf="f['valeur'].errors?.['required']">La note est requise</div>
+              <div *ngIf="f['valeur'].errors?.['min']">La note doit être ≥ 0</div>
+              <div *ngIf="f['valeur'].errors?.['max']">La note doit être ≤ 20</div>
+              <div *ngIf="f['valeur'].errors?.['pattern']">Format invalide (ex: 15.5)</div>
+            </div>
+          </div>
+
+          <!-- Prévisualisation Note -->
+          <div class="note-preview-group" *ngIf="f['valeur'].value">
+            <label class="form-label">Appréciation</label>
+            <div class="note-preview-card {{ getNoteColor(f['valeur'].value) }}">
+              <div class="note-value-display">
+                <span class="note-number">{{ f['valeur'].value | number:'1.2-2' }}</span>
+                <span class="note-max">/20</span>
+              </div>
+              <div class="note-appreciation">
+                {{ getAppreciation(f['valeur'].value) }}
+              </div>
+              <div class="note-indicator">
+                <div class="indicator-bar" [style.width.%]="(f['valeur'].value / 20) * 100"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Commentaire -->
+        <div class="form-group full-width">
+          <label class="form-label">
+            <i class="bi bi-chat-left-text"></i>
+            Commentaire
+          </label>
+          <textarea
+            formControlName="commentaire"
+            class="modern-textarea"
+            placeholder="Observations facultatives sur l'évaluation..."
+            rows="3"
+            maxlength="200"></textarea>
+          <div class="input-footer">
+            <div class="char-count">
+              {{ f['commentaire'].value?.length || 0 }}/200 caractères
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-outline"
+          (click)="reinitialiserFormulaire()">
+          <i class="bi bi-x-circle"></i>
+          Annuler
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isSubmitting || noteForm.invalid"
+          [class.loading]="isSubmitting">
+
+          <span class="button-content" *ngIf="!isSubmitting">
+            <i class="bi bi-check-lg"></i>
+            Attribuer la Note
+          </span>
+
+          <span class="button-content" *ngIf="isSubmitting">
+            <div class="button-spinner"></div>
+            Attribution en cours...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

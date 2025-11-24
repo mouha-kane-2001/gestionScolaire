@@ -1,0 +1,61 @@
+
+<ng-container>
+    <header cHeader class="header-container custom-header">
+    <div class="header-content">
+            <nav class="header-nav main-nav">
+
+       <div class="nav-item">
+  <a class="nav-link" routerLink="/parent/convocations" routerLinkActive="active">
+    <i class="bi bi-megaphone"></i>
+    Convocations
+  </a>
+</div>
+
+<div class="nav-item">
+  <a class="nav-link" routerLink="/parent/messages/parent" routerLinkActive="active">
+    <i class="bi bi-chat-dots"></i>
+    Messages
+  </a>
+</div>
+
+<div class="nav-item">
+  <a class="nav-link" routerLink="/parent/absences/sparent" routerLinkActive="active">
+    <i class="bi bi-calendar-x"></i>
+    Absences
+  </a>
+</div>
+
+<div class="nav-item">
+  <a class="nav-link" routerLink="/parent/notes/parent" routerLinkActive="active">
+    <i class="bi bi-journal-check"></i>
+    Notes
+  </a>
+</div>
+
+<div class="nav-item">
+  <a class="nav-link" routerLink="/settings" routerLinkActive="active">
+    <i class="bi bi-gear"></i>
+    Paramètres
+  </a>
+</div>
+
+      </nav>
+    </div>
+
+
+
+    <div class="breadcrumb-container">
+      <!-- Breadcrumb serait généré dynamiquement -->
+      <nav class="breadcrumb">
+        <a class="breadcrumb-item" routerLink="/dashboard">
+          <i class="bi bi-house"></i>
+          Home
+        </a>
+        <a class="breadcrumb-item" routerLink="/dashboard">
+          <i class="bi bi-speedometer2"></i>
+          Dashboard
+        </a>
+      </nav>
+    </div>
+</header>
+</ng-container>

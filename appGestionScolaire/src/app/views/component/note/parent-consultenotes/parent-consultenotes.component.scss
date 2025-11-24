@@ -1,0 +1,81 @@
+/* parent-consultenotes.component.scss */
+.avatar-circle {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.enfant-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #e9ecef;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+}
+
+.info-box {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+
+  i {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+  }
+}
+
+.stat-card {
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+}
+
+.badge-devoir {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.badge-examen {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .avatar-circle {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+
+  .info-box {
+    margin-bottom: 1rem;
+  }
+}

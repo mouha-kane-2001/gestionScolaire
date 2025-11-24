@@ -1,0 +1,38 @@
+// Toujours mettre les @use en premier
+@use '@angular/material' as mat;
+@use "@coreui/coreui/scss/coreui" as * with (
+  $enable-deprecation-messages: false
+);
+@use "@coreui/chartjs/scss/coreui-chartjs";
+@use "theme";
+//@use "fixes";
+@use "custom";
+@use "examples";
+
+// Ensuite seulement tes règles CSS
+html {
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+}
+
+html, body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
