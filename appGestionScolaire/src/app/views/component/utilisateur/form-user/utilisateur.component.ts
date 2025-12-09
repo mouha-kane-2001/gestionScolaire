@@ -16,6 +16,67 @@ import { Router, ActivatedRoute } from '@angular/router';
   styleUrls: ['./utilisateur.component.scss']
 })
 export class UtilisateurComponent implements OnInit {
+
+
+  // PROPRIÉTÉS POUR LES ALERTES
+  showAlert = false;
+  alertType: 'success' | 'danger' | 'warning' | 'info' = 'success';
+  alertMessage = '';
+  alertTimeout: any = null;
+
+    // MÉTHODES POUR LES ALERTES
+  showAlertMessage(message: string, type: 'success' | 'danger' | 'warning' | 'info' = 'info', duration: number = 5000) {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlert = true;
+
+    // Annuler l'alerte précédente si elle existe
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+    }
+
+    // Auto-fermeture après la durée spécifiée
+    this.alertTimeout = setTimeout(() => {
+      this.closeAlert();
+    }, duration);
+  }
+
+  closeAlert() {
+    this.showAlert = false;
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+      this.alertTimeout = null;
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 utilisateur :Utilisateur = {
     id: null,
     telephone: '',
@@ -29,6 +90,8 @@ utilisateur :Utilisateur = {
     matiere_id :null,      // Pour professeur
     elevesIds: []  as number[]         // Pour parent
   };
+    originalEmail: string = ''; // ← ajoute cette ligne
+
 classes: Classe[] = [];     // Liste des classes depuis l'API
   matieres: Matiere[] = [];    // Liste des matières depuis l'API
   eleves: any[] = [];      // Liste des élèves depuis l'API
@@ -81,6 +144,7 @@ classes: Classe[] = [];     // Liste des classes depuis l'API
           matiere_id: data.matiere_id || null,
           elevesIds: data.elevesIds || []
         };
+        this.originalEmail = data.email; // ← important !
       },
       error: () => alert('Erreur lors du chargement de l’utilisateur')
     });
@@ -122,12 +186,12 @@ chargerEleves() {
 soumettreFormulaire() {
   if (this.mode === 'ajout') {
     if (!this.motDePasse || !this.utilisateur.email) {
-      alert('Tous les champs sont obligatoires.');
+      this.showAlertMessage('Tous les champs sont obligatoires.','danger');
       return;
     }
 
     if (this.motDePasse.trim() !== '' && this.motDePasse !== this.confirmerMotDePasse) {
-      alert('Les mots de passe ne correspondent pas.');
+      this.showAlertMessage('Les mots de passe ne correspondent pas.','danger');
       return;
     }
 
@@ -149,50 +213,89 @@ soumettreFormulaire() {
     console.log('Données envoyées:', userData);
 
     this.userService.createUser(userData).subscribe({
-      next: () => {
-        alert('Utilisateur ajouté avec succès !');
-        this.resetForm();
-        this.router.navigate(['/users']);
-      },
+             next: () => {
+      this.resetForm();
+       this.showAlertMessage('Utilisateur ajouté avec succès !','success');
+
+      setTimeout(() => {
+  this.router.navigate(['/users']);
+}, 1500);
+
+
+
+    },
+
+
       error: (err) => {
         if (err.status === 400 && err.error?.message?.includes('email')) {
-          alert('Cet email existe déjà.');
+          this.showAlertMessage('Cet email existe déjà.','danger');
         } else {
           console.error('Erreur complète:', err);
-          alert('Erreur lors de l\'ajout: ' + (err.error?.message || 'Erreur inconnue'));
+          this.showAlertMessage('Erreur lors de l\'ajout: ' + (err.error?.message || 'Erreur inconnue'));
         }
       }
     });
   }  else { // Modification
+// Modification
+  if (!this.utilisateur.id) {
+    this.showAlertMessage('Aucun utilisateur sélectionné pour modification','danger');
+    return;
+  }
 
-      if (!this.utilisateur.id) {
-        alert('Aucun utilisateur sélectionné pour modification');
-        return;
+  // Préparer le payload
+  const userData: any = {
+  prenom: this.utilisateur.prenom,
+  nom: this.utilisateur.nom,
+  role: this.utilisateur.role,
+  telephone: this.utilisateur.telephone || '',
+  classe_id: this.utilisateur.classe_id || null,
+  matiere_id: this.utilisateur.matiere_id || null,
+    email: this.utilisateur.email // ← toujours envoyé
+};
+
+  // Ajouter le mot de passe seulement si l'utilisateur en a saisi un
+  // Inclure le mot de passe uniquement si modifié
+if (this.motDePasse && this.motDePasse.trim() !== '') {
+  if (this.motDePasse !== this.confirmerMotDePasse) {
+    this.showAlertMessage('Les mots de passe ne correspondent pas.','danger');
+    return;
+  }
+  userData.password = this.motDePasse;
+}
+
+// Inclure l’email seulement si il a été changé
+if (this.utilisateur.email !== this.originalEmail) {
+  userData.email = this.utilisateur.email;
+}
+
+  console.log('Payload modification:', userData);
+
+  this.userService.updateUser(this.utilisateur.id, userData).subscribe({
+    next: () => {
+      this.resetForm();
+       this.showAlertMessage('Utilisateur modifié avec succès ! !', 'success');
+
+      setTimeout(() => {
+  this.router.navigate(['/users']);
+}, 1500);
+
+
+
+    },
+    error: (err) => {
+      console.error(err);
+      if (err.status === 400 && err.error?.message?.includes('email'),'danger') {
+        this.showAlertMessage('Cet email existe déjà.','danger');
+      } else {
+        this.showAlertMessage('Erreur lors de la modification: ' + JSON.stringify(err.error),'danger');
       }
-
-      if (this.motDePasse.trim() !== '') {
-        if (this.motDePasse !== this.confirmerMotDePasse) {
-          alert('Les mots de passe ne correspondent pas.');
-          return;
-        }
-        this.utilisateur.motDePasseClaire = this.motDePasse;
-      }
-
-      this.userService.updateUser(this.utilisateur.id, this.utilisateur).subscribe({
-        next: () => {
-          alert('Utilisateur modifié avec succès !');
-          this.resetForm();
-        this.router.navigate(['/users']);
-        },
-        error: (err) => {
-          if (err.status === 400 && err.error?.message?.includes('email')) {
-            alert('Cet email existe déjà.');
-          } else {
-            alert('Erreur lors de la modification');
-          }
-        }
-      });
     }
+  });
+
+}
+
+
+
   }
 
   editerUtilisateur(user: any) {

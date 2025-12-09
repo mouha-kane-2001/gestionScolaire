@@ -1,5 +1,13 @@
 <!-- eleve-messages.component.html -->
 <div class="messaging-app">
+   <div *ngIf="showAlert"
+                 class="alert"
+                 [ngClass]="{'alert-success': alertType==='success', 'alert-danger': alertType==='danger'}"
+                 role="alert">
+              {{ alertMessage }}
+              <button type="button" class="btn-close" (click)="closeAlert()"></button>
+            </div>
+
   <!-- Header élégant -->
   <div class="app-header">
     <div class="header-content">
@@ -404,7 +412,7 @@
           <i class="bi bi-reply"></i>
           Répondre
         </button>
-         
+
       </div>
     </div>
   </div>

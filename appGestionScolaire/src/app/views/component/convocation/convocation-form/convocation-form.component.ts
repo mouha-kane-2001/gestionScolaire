@@ -19,6 +19,41 @@ import { CommonModule } from '@angular/common';
 })
 export class ConvocationFormComponent {
 
+
+  // PROPRIÉTÉS POUR LES ALERTES
+  showAlert = false;
+  alertType: 'success' | 'danger' | 'warning' | 'info' = 'success';
+  alertMessage = '';
+  alertTimeout: any = null;
+
+    // MÉTHODES POUR LES ALERTES
+  showAlertMessage(message: string, type: 'success' | 'danger' | 'warning' | 'info' = 'info', duration: number = 5000) {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlert = true;
+
+    // Annuler l'alerte précédente si elle existe
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+    }
+
+    // Auto-fermeture après la durée spécifiée
+    this.alertTimeout = setTimeout(() => {
+      this.closeAlert();
+    }, duration);
+  }
+
+  closeAlert() {
+    this.showAlert = false;
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+      this.alertTimeout = null;
+    }
+  }
+
+
+
+
 convocationForm: FormGroup;
   eleves: Eleve[] = [];
   classes: Classe[] = [];
@@ -57,8 +92,13 @@ convocationForm: FormGroup;
         this.eleves = data;
         this.filteredEleves = data;
       },
-      error: (err) => console.error('Erreur chargement élèves:', err)
-    });
+
+        error: (err) => {
+    console.error('Erreur chargement élèves:', err);
+    this.showAlertMessage('Erreur lors du chargement des élèves.','danger');
+  }
+});
+
   }
 
   getClasses(): void {
@@ -114,7 +154,7 @@ convocationForm: FormGroup;
         if (formValue.eleve_id) {
           this.envoyerConvocationParent(formValue.eleve_id, convocationData);
         } else {
-          this.showNotification('Veuillez sélectionner un élève', 'error');
+              this.showAlertMessage('Veuillez sélectionner un élève', 'danger')
         }
         break;
 
@@ -122,7 +162,8 @@ convocationForm: FormGroup;
         if (formValue.classe_id) {
           this.envoyerConvocationClasse(formValue.classe_id, convocationData);
         } else {
-          this.showNotification('Veuillez sélectionner une classe', 'error');
+
+          this.showAlertMessage('Veuillez sélectionner une class', 'danger')
         }
         break;
 
@@ -137,7 +178,8 @@ convocationForm: FormGroup;
     const eleve = this.eleves.find(e => e.id === eleveIdNumber);
 
     if (!eleve) {
-      this.showNotification(`Erreur: Élève non trouvé`, 'error');
+      this.showAlertMessage(`Erreur: Élève non trouvé`, 'danger');
+
       return;
     }
     console.log('Élève trouvé:', eleve);
@@ -146,7 +188,7 @@ convocationForm: FormGroup;
 
 
   if (!parentId) {
-    this.showNotification(`Erreur: Le parent de l'élève ${eleve.prenom} ${eleve.nom} n'est pas associé.`, 'error');
+    this.showAlertMessage(`Erreur: Le parent de l'élève ${eleve.prenom} ${eleve.nom} n'est pas associé.`, 'danger');
     return;
   }
 console.log('ID du parent:', parentId);
@@ -162,7 +204,7 @@ console.log('ID du parent:', parentId);
       next: () => this.handleSuccess(),
       error: (err) => {
         console.error('Erreur envoi convocation:', err);
-        this.showNotification('Erreur lors de l\'envoi de la convocation', 'error');
+        this.showAlertMessage('Erreur lors de l\'envoi de la convocation', 'danger');
       }
     });
   }
@@ -175,7 +217,7 @@ const elevesClasse = this.eleves.filter(eleve =>
 );
 
     if (elevesClasse.length === 0) {
-      this.showNotification('Aucun élève trouvé dans cette classe', 'error');
+      this.showAlertMessage('Aucun élève trouvé dans cette classe', 'danger');
       return;
     }
 
@@ -242,7 +284,7 @@ const elevesClasse = this.eleves.filter(eleve =>
     this.typeDestinataire = 'parent';
     this.classeFilter = '';
     this.filteredEleves = this.eleves;
-    this.showNotification('Convocation envoyée avec succès', 'success');
+    this.showAlertMessage('Convocation envoyée avec succès', 'success');
   }
 
   private handleSuccessClasse(succes: number, erreurs: number = 0): void {
@@ -252,9 +294,9 @@ const elevesClasse = this.eleves.filter(eleve =>
     this.filteredEleves = this.eleves;
 
     if (erreurs > 0) {
-      this.showNotification(`Convocations envoyées: ${succes} réussies, ${erreurs} échecs`, 'info');
+      this.showAlertMessage(`Convocations envoyées: ${succes} réussies, ${erreurs} échecs`, 'danger');
     } else {
-      this.showNotification(`${succes} convocations envoyées avec succès à la classe`, 'success');
+      this.showAlertMessage(`${succes} convocations envoyées avec succès à la classe`, 'success');
     }
   }
 
@@ -265,9 +307,9 @@ const elevesClasse = this.eleves.filter(eleve =>
     this.filteredEleves = this.eleves;
 
     if (erreurs > 0) {
-      this.showNotification(`Convocations envoyées: ${succes} réussies, ${erreurs} échecs`, 'info');
+      this.showAlertMessage(`Convocations envoyées: ${succes} réussies, ${erreurs} échecs`, 'danger');
     } else {
-      this.showNotification(`${succes} convocations envoyées à tous les parents`, 'success');
+      this.showAlertMessage(`${succes} convocations envoyées à tous les parents`, 'success');
     }
   }
 
@@ -277,11 +319,7 @@ const elevesClasse = this.eleves.filter(eleve =>
     });
   }
 
-  private showNotification(message: string, type: 'success' | 'error' | 'info'): void {
-     console.log(`${type.toUpperCase()}: ${message}`);
-    // Exemple avec alert - à remplacer par votre système de notification
-    alert(`${type.toUpperCase()}: ${message}`);
-  }
+
 
   getObjetPlaceholder(): string {
     const placeholders = {

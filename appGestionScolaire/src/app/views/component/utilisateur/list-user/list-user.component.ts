@@ -3,18 +3,90 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
   import { FormsModule} from '@angular/forms';
 import { UserService } from '../../../../services/utilisateur/user.service';
+
 @Component({
   selector: 'app-list-user',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './list-user.component.html',
-  styleUrl: './list-user.component.scss'
+  styleUrls: ['./list-user.component.scss']
 })
 export class ListUserComponent implements OnInit{
+
+  // PROPRIÉTÉS POUR LES ALERTES
+  showAlert = false;
+  alertType: 'success' | 'danger' | 'warning' | 'info' = 'success';
+  alertMessage = '';
+  alertTimeout: any = null;
+
+    // MÉTHODES POUR LES ALERTES
+  showAlertMessage(message: string, type: 'success' | 'danger' | 'warning' | 'info' = 'info', duration: number = 5000) {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlert = true;
+
+    // Annuler l'alerte précédente si elle existe
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+    }
+
+    // Auto-fermeture après la durée spécifiée
+    this.alertTimeout = setTimeout(() => {
+      this.closeAlert();
+    }, duration);
+  }
+
+  closeAlert() {
+    this.showAlert = false;
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+      this.alertTimeout = null;
+    }
+  }
+
+
+
+
 
  utilisateurs: any[] = [];
 allUtilisateurs: any[] = [];     // copie complète avant filtrage
   selectedRole: string = '';       // rôle choisi dans le select
+         // total des utilisateurs pour la pagination
+
+
+         // Dans la classe ListUserComponent, ajoutez :
+page: number = 1;
+perPage: number = 10;
+totalUsers: number = 0;
+get totalPages(): number {
+  return Math.ceil(this.totalUsers / this.perPage);
+}
+
+// Méthode pour changer de page
+changePage(newPage: number) {
+  if (newPage < 1 || newPage > this.totalPages) return;
+  this.page = newPage;
+  this.chargerUtilisateurs();
+}
+
+// Méthode pour générer un tableau de pages à afficher
+getPageNumbers(): number[] {
+  const pages = [];
+  const maxPagesToShow = 5;
+  let startPage = Math.max(1, this.page - 2);
+  let endPage = Math.min(this.totalPages, startPage + maxPagesToShow - 1);
+
+  if (endPage - startPage + 1 < maxPagesToShow) {
+    startPage = Math.max(1, endPage - maxPagesToShow + 1);
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
+  return pages;
+}
+
+
 
 
    selectedUser: any = null;
@@ -28,18 +100,20 @@ allUtilisateurs: any[] = [];     // copie complète avant filtrage
 
 
   chargerUtilisateurs() {
-    this.userService.getAllUsers().subscribe({
-      next: (data: any[]) => {
-        this.utilisateurs = data;
-        this.allUtilisateurs = data;       // on garde l'original
+  this.userService.getUsersPaginated(this.page, this.perPage).subscribe({
+    next: (res: any) => {
+      this.utilisateurs = res.data;     // <-- utilise res.data
+      this.totalUsers = res.total;      // pour la pagination
+      this.allUtilisateurs = res.data;  // si tu veux garder l'original
+    },
+    error: (err: any) => {
+      console.error(err);
+      this.showAlertMessage('Erreur lors du chargement des utilisateurs','danger');
+    }
+  });
+}
 
-      },
-      error: (err: any) => {
-        console.error(err);
-        alert('Erreur lors du chargement des utilisateurs');
-      }
-    });
-  }
+
 getCountByRole(role: string): number {
   return this.utilisateurs.filter(u => u.role === role).length;
 }
@@ -47,7 +121,7 @@ getCountByRole(role: string): number {
 supprimerUtilisateur(id: number) {
   this.userService.deleteUser(id).subscribe({
     next: () => {
-      alert("Suppression réussie");
+      this.showAlertMessage("Suppression réussie,'danger");
       this.chargerUtilisateurs();
     },
     error: (err) => {
@@ -63,7 +137,7 @@ modifierUtilisateur(u: any) {
     console.log('Utilisateur chargé:', data);
     // ensuite tu peux remplir ton formulaire ou envoyer à un autre composant
   });
-  this.router.navigate(['/utilisateurs/edit', u.id]);
+  this.router.navigate(['/users/edit', u.id]);
 }
 
 changeUserRole(u: any, nouveauRole: string) {
@@ -80,5 +154,8 @@ filtrerParRole() {
       this.utilisateurs = this.allUtilisateurs.filter(u => u.role === this.selectedRole);
     }
   }
+
+
+
 
 }

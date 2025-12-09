@@ -1,19 +1,48 @@
 <div class="dashboard-eleve">
+
   <!-- En-tête avec dégradé -->
   <div class="student-header mb-4">
-    <div class="d-flex justify-content-between align-items-center">
-      <div>
-        <h1 class="mb-1 text-black ">Bonjour  {{ eleves?.prenom }} {{ eleves?.nom }} ! 👋</h1>
-        <p class="text-black-50 mb-0">  {{ eleves?.classe   }} </p>
-      </div>
-      <div class="d-flex gap-2">
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+      <div class="row align-items-center">
+        <!-- Section gauche avec infos élève -->
+        <div class="col-md-8">
+          <div class="d-flex align-items-center">
+            <div class="avatar-container me-3">
+              <div class="student-avatar bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center">
+                <span class="avatar-initials text-white fw-bold">{{ getInitials(userPrenom, userNom) }}</span>
+              </div>
+            </div>
+            <div>
+              <h1 class="h3 mb-1">
+                Bonjour, <span class="text-primary"> {{ userPrenom }} {{ userNom }}</span>
+              </h1>
+              <div class="d-flex align-items-center gap-3">
 
-        <button cButton color="light" size="sm" routerLink="/eleve/notes">
-          <i class="cil-notes me-1"></i> Mes notes
-        </button>
+                <span class="badge bg-primary bg-gradient">
+                  <i class="cil-user me-1"></i>
+                  Élève
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section droite avec boutons -->
+        <div class="col-md-4">
+          <div class="d-flex justify-content-end gap-2">
+            <button cButton color="outline-primary" size="sm" routerLink="/eleve/notes">
+              <i class="cil-notes me-1"></i> Mes notes
+            </button>
+            <button cButton color="outline-success" size="sm" routerLink="/eleve/absences">
+              <i class="cil-calendar me-1"></i> Absences
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
   <!-- Cartes de statistiques colorées -->
   <c-row class="mb-4">

@@ -83,6 +83,9 @@ export class DashboardParentComponent implements OnInit {
   // Données des élèves
   eleves: Eleve[] = [
       ];
+      // Ajoutez ces propriétés dans la classe
+userPrenom: string = '';
+userNom: string = '';
 
   // Données des absences récentes
   absencesRecentes: Absence[] = [
@@ -167,7 +170,28 @@ export class DashboardParentComponent implements OnInit {
   this.chargerConvocationsRecentes();
   this.chargerNotesRecentes();
 
+  this.loadUserInfo();
+
   }
+
+  // Nouvelle méthode pour charger les infos utilisateur
+loadUserInfo(): void {
+  const userInfo = this.authService.getUserInfo();
+
+  if (userInfo.nomUtilisateur) {
+    const nomComplet = userInfo.nomUtilisateur.split(' ');
+    if (nomComplet.length >= 2) {
+      this.userNom = nomComplet[0];
+      this.userPrenom = nomComplet.slice(1).join(' ');
+    } else {
+      this.userNom = userInfo.nomUtilisateur;
+      this.userPrenom = '';
+    }
+  } else {
+    this.userPrenom = 'Parent';
+    this.userNom = '';
+  }
+}
 
   chargerConvocationsRecentes() {
   const parentId = this.authService.getParentId();

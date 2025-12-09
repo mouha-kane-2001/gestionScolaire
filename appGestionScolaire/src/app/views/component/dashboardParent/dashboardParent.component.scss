@@ -44,3 +44,35 @@
     }
   }
 }
+
+
+
+
+
+
+
+
+
+.dashboard-header {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-left: 4px solid #39f;
+}
+
+.avatar-admin {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.avatar-admin:hover {
+  transform: scale(1.05);
+}
+
+.badge.bg-gradient {
+  background: linear-gradient(135deg, #39f 0%, #2982cc 100%);
+  border: none;
+}
+
+.badge.bg-info {
+  background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%);
+  border: none;
+}

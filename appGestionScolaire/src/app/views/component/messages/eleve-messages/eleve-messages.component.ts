@@ -25,6 +25,42 @@ interface Professeur {
 })
 export class EleveMessagesComponent implements OnInit {
 
+
+  // PROPRIÉTÉS POUR LES ALERTES
+  showAlert = false;
+  alertType: 'success' | 'danger' | 'warning' | 'info' = 'success';
+  alertMessage = '';
+  alertTimeout: any = null;
+
+    // MÉTHODES POUR LES ALERTES
+  showAlertMessage(message: string, type: 'success' | 'danger' | 'warning' | 'info' = 'info', duration: number = 5000) {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlert = true;
+
+    // Annuler l'alerte précédente si elle existe
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+    }
+
+    // Auto-fermeture après la durée spécifiée
+    this.alertTimeout = setTimeout(() => {
+      this.closeAlert();
+    }, duration);
+  }
+
+  closeAlert() {
+    this.showAlert = false;
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+      this.alertTimeout = null;
+    }
+  }
+
+
+
+
+
   messageForm: FormGroup;
   messagesRecus: Message[] = [];
   messagesEnvoyes: Message[] = [];
@@ -247,7 +283,7 @@ export class EleveMessagesComponent implements OnInit {
     const prof = this.professeurs.find(p => p.user_id === profId);
 
     if (!prof) {
-      this.showNotification('Veuillez sélectionner un professeur', 'error');
+      this.showAlertMessage('Veuillez sélectionner un professeur', 'danger');
       return;
     }
 
@@ -266,7 +302,7 @@ export class EleveMessagesComponent implements OnInit {
 
     this.messageService.sendMessage(messageData).subscribe({
       next: () => {
-        this.showNotification('Message envoyé avec succès', 'success');
+        this.showAlertMessage('Message envoyé avec succès', 'success');
         this.messageForm.reset({
           destinataire_type: 'prof',
           priorite: 'normal'
@@ -276,7 +312,7 @@ export class EleveMessagesComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erreur envoi message:', err);
-        this.showNotification('Erreur lors de l\'envoi du message', 'error');
+        this.showAlertMessage('Erreur lors de l\'envoi du message', 'danger');
       }
     });
   }
@@ -350,11 +386,7 @@ export class EleveMessagesComponent implements OnInit {
     });
   }
 
-  private showNotification(message: string, type: 'success' | 'error' | 'info'): void {
-    // Implémentez votre système de notification
-    console.log(`${type.toUpperCase()}: ${message}`);
-    alert(message);
-  }
+
 
   // Méthodes pour la navigation entre sections
   showSection(section: 'composer' | 'recus' | 'envoyes'): void {

@@ -25,6 +25,11 @@ private apiUrl = `${environment.apiUrl}/utilisateurs`;
   getAllUsers() {
   return this.http.get<any[]>(this.apiUrl);
 }
+
+getUsersPaginated(page: number = 1, perPage: number = 10) {
+  return this.http.get<any>(`${this.apiUrl}/pagination?page=${page}&perPage=${perPage}`);
+}
+
   // Récupérer un utilisateur par son id
   getUserById(id: number) {
     return this.http.get<any>(`${this.apiUrl}/${id}`);

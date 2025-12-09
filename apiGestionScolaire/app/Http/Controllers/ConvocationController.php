@@ -21,7 +21,7 @@ class ConvocationController extends Controller
     $convocations = Convocation::with([
         'parent.user', // parent + son user
         'eleve.user' ,// élève + son user
-          'eleve.classe'   // élève + son user
+        'eleve.classe'   // élève + son user
 
     ])
     ->where('parent_id', $parentId)

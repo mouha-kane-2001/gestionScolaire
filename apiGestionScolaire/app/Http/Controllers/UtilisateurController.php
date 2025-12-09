@@ -29,6 +29,23 @@ class UtilisateurController extends Controller
         return $query->get();
     }
 
+       public function indexPagination(Request $request)
+{
+    $role = $request->query('role');
+    $perPage = $request->query('perPage', 10); // par défaut 10
+    $page = $request->query('page', 1);
+
+    $query = User::query();
+
+    if ($role) {
+        $query->where('role', $role);
+    }
+
+    $utilisateurs = $query->orderBy('created_at', 'desc')->paginate($perPage, ['*'], 'page', $page);
+
+    return response()->json($utilisateurs);
+}
+
    public function store(UserRequest $requestUser)
 {
     $data = $requestUser->validated();
@@ -133,40 +150,64 @@ $updated = Eleve::whereIn('id', $elevesIds)->update(['parent_id' => $parent->id]
     }
 
     public function update(UserRequest $request, $id)
-    {
-        $utilisateur = User::find($id);
-        if (!$utilisateur) {
-            return response()->json(['message' => 'Utilisateur non trouvé'], 404);
-        }
-
-        $data = $request->validated();
-        $utilisateur->nom = $data['prenom'];
-        $utilisateur->nom = $data['nom'];
-        $utilisateur->email = $data['email'];
-        $utilisateur->role = $data['role'];
-
-        if (!empty($data['password'])) {
-            $utilisateur->password = Hash::make($data['password']);
-        }
-
-        // Réinitialiser les champs spécifiques
-        $utilisateur->classeId = null;
-        $utilisateur->matiereId = null;
-        $utilisateur->elevesIds = [];
-
-        // Re-appliquer si nécessaire
-        if ($data['role'] === 'eleve') {
-            $utilisateur->classeId = $request->classeId ?? null;
-        } elseif ($data['role'] === 'enseignant') {
-            $utilisateur->matiereId = $request->matiereId ?? null;
-        } elseif ($data['role'] === 'parent') {
-            $utilisateur->elevesIds = $request->elevesIds ?? [];
-        }
-
-        $utilisateur->save();
-
-        return response()->json($utilisateur);
+{
+    // Récupérer l'utilisateur
+    $utilisateur = User::find($id);
+    if (!$utilisateur) {
+        return response()->json(['message' => 'Utilisateur non trouvé'], 404);
     }
+
+    // Valider les données
+    $data = $request->validated();
+
+    // Mise à jour des champs généraux
+    $utilisateur->prenom = $data['prenom'];
+    $utilisateur->nom = $data['nom'];
+    $utilisateur->email = $data['email'];
+    $utilisateur->role = $data['role'];
+
+    if (!empty($data['password'])) {
+        $utilisateur->password = Hash::make($data['password']);
+    }
+
+    $utilisateur->save();
+
+    // Mise à jour selon le rôle
+    if ($data['role'] === 'eleve') {
+        $eleve = Eleve::where('user_id', $utilisateur->id)->first();
+        if ($eleve) {
+            $eleve->classe_id = $request->input('classe_id');
+            $eleve->save();
+        }
+    } elseif ($data['role'] === 'prof') {
+        $prof = Professeur::where('user_id', $utilisateur->id)->first();
+        if ($prof) {
+            $prof->matiere_id = $request->input('matiere_id');
+            $prof->save();
+        }
+    } elseif ($data['role'] === 'admin') {
+        $admin = Admin::where('user_id', $utilisateur->id)->first();
+        if ($admin) {
+            // Tu peux mettre à jour des champs de l'admin ici si nécessaire
+            $admin->save();
+        }
+    } elseif ($data['role'] === 'parent') {
+        $parent = ParentEleve::where('user_id', $utilisateur->id)->first();
+        if ($parent) {
+            $parent->telephone = $request->input('telephone', $parent->telephone);
+            $parent->save();
+
+            // Mettre à jour les élèves associés
+            $elevesIds = $request->input('elevesIds', []);
+            if (!empty($elevesIds)) {
+                Eleve::whereIn('id', $elevesIds)->update(['parent_id' => $parent->id]);
+            }
+        }
+    }
+
+    return response()->json($utilisateur);
+}
+
 
     public function destroy($id)
     {

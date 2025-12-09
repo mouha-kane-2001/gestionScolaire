@@ -32,11 +32,11 @@ export class NotificationService {
 
   // Marquer une notification comme lue
   marquerCommeLu(notificationId: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/mark-read/${notificationId}`, {});
+    return this.http.put(`${this.apiUrl}/marquer-lu/${notificationId}`, {});
   }
 
   // Marquer toutes les notifications d'un utilisateur comme lues
   marquerToutesCommeLues(userId: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/mark-all-read/${userId}`, {});
+    return this.http.put(`${this.apiUrl}/marquer-toutes-lu/${userId}`, {});
   }
 }

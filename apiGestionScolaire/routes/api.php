@@ -17,7 +17,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/matieres', [MatiereController::class, 'index']);
 Route::get('/classes', [ClasseController::class, 'index']);
+Route::get('/utilisateurs/pagination', [UtilisateurController::class, 'indexPagination']);
+
 Route::apiResource('utilisateurs',UtilisateurController::class);
+
 Route::get('eleves/elevesAvecmatricule', [EleveController::class, 'getElevesAvecMatricule']);
 
 // ✅ Routes messages correctes
@@ -41,8 +44,6 @@ Route::post('/notes/attribuer', [NoteController::class, 'store']);
 // Récupérer les notes d'un élève spécifique
 Route::get('/notes/eleve/{eleveId}', [NoteController::class, 'getNotesParEleve']);
 
-// Modifier une note
-Route::put('/notes/{noteId}', [NoteController::class, 'update']);
 
 // Supprimer une note
 Route::delete('/notes/{noteId}', [NoteController::class, 'destroy']);
@@ -121,3 +122,14 @@ Route::get('/notes/prof/{profId}', [NoteController::class, 'getNotesByProf']);
 Route::get('/notes/prof/{profId}', [NoteController::class, 'getNotesByProf']);
 Route::get('/eleves/prof/{profId}', [UtilisateurController::class, 'getElevesByProf']);
 Route::get('/absences/prof/{profId}', [AbsenceController::class, 'getAbsencesByProf']);
+// Modification en masse
+Route::put('/notes/bulk-update', [NoteController::class, 'updateBulk']);
+
+Route::get('/notes/eleves/{classeId}/{matiereId}', [NoteController::class, 'getNotesByFiltre']);
+
+
+
+Route::post('/notes/bulk', [NoteController::class, 'storeBulk']); // POST
+// routes/api.php
+Route::get('/notes/numeros-disponibles', [NoteController::class, 'getNumerosDisponibles']);
+

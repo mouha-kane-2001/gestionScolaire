@@ -7,11 +7,12 @@ import { delay, filter, map, tap } from 'rxjs/operators';
 import { ColorModeService } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
+import { AlertGlobalComponent } from './views/component/alert-global/alert-global.component';
 
 @Component({
     selector: 'app-root',
     template: '<router-outlet />',
-    imports: [RouterOutlet]
+    imports: [RouterOutlet,AlertGlobalComponent]
 })
 export class AppComponent implements OnInit {
   title = 'CoreUI Angular Admin Template';

@@ -31,6 +31,42 @@ interface DemandeAdmin {
 })
 export class ProfMessagesComponent implements OnInit {
 
+
+  // PROPRIÉTÉS POUR LES ALERTES
+  showAlert = false;
+  alertType: 'success' | 'danger' | 'warning' | 'info' = 'success';
+  alertMessage = '';
+  alertTimeout: any = null;
+
+    // MÉTHODES POUR LES ALERTES
+  showAlertMessage(message: string, type: 'success' | 'danger' | 'warning' | 'info' = 'info', duration: number = 5000) {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlert = true;
+
+    // Annuler l'alerte précédente si elle existe
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+    }
+
+    // Auto-fermeture après la durée spécifiée
+    this.alertTimeout = setTimeout(() => {
+      this.closeAlert();
+    }, duration);
+  }
+
+  closeAlert() {
+    this.showAlert = false;
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+      this.alertTimeout = null;
+    }
+  }
+
+
+
+
+
   messagesRecus: Message[] = [];
   messagesEnvoyes: Message[] = [];
   filteredMessages: Message[] = [];
@@ -261,7 +297,7 @@ currentSection: 'composer' | 'recus' | 'envoyes' = 'envoyes';
       this.currentSection = 'envoyes';
     }
 
-    this.showNotification(
+    this.showAlertMessage(
       wasAdminMessage ? 'Demande envoyée avec succès' : 'Message envoyé avec succès',
       'success'
     );
@@ -331,7 +367,7 @@ envoyerMessage() {
       // Envoi à un seul destinataire (élève ou parent)
       this.sendToSingleDestinataire(formValue.destinataire_id, messageData);
     } else {
-      this.showNotification('Veuillez sélectionner un destinataire', 'error');
+      this.showAlertMessage('Veuillez sélectionner un destinataire', 'danger');
       return;
     }
   }
@@ -343,7 +379,7 @@ private sendToSingleDestinataire(destinataireId: number, messageData: any) {
   const eleve = this.eleves.find(e => e.id === destinataireId);
 
   if (!eleve) {
-    this.showNotification(`Erreur: Destinataire non trouvé`, 'error');
+    this.showAlertMessage(`Erreur: Destinataire non trouvé`, 'danger');
     return;
   }
 
@@ -362,7 +398,7 @@ private sendToSingleDestinataire(destinataireId: number, messageData: any) {
   } else {
     // Option 2 : Envoyer au parent (comportement actuel)
     if (!eleve.parent_id) {
-      this.showNotification(`Erreur: Le parent de l'élève ${eleve.prenom} ${eleve.nom} n'est pas associé.`, 'error');
+      this.showAlertMessage(`Erreur: Le parent de l'élève ${eleve.prenom} ${eleve.nom} n'est pas associé.`, 'danger');
       return;
     }
 
@@ -378,7 +414,7 @@ private sendToSingleDestinataire(destinataireId: number, messageData: any) {
     next: () => this.handleSendSuccess(),
     error: (err) => {
       console.error('Erreur envoi message:', err);
-      this.showNotification('Erreur lors de l\'envoi du message', 'error');
+      this.showAlertMessage('Erreur lors de l\'envoi du message', 'danger');
     }
   });
 }
@@ -421,7 +457,7 @@ private sendToMultipleDestinataires(destinatairesIds: number[], messageData: any
   }).filter(req => req !== null); // Filtrer les requêtes nulles
 
   if (requests.length === 0) {
-    this.showNotification('Aucun destinataire valide sélectionné', 'error');
+    this.showAlertMessage('Aucun destinataire valide sélectionné', 'danger');
     return;
   }
 
@@ -429,11 +465,11 @@ private sendToMultipleDestinataires(destinatairesIds: number[], messageData: any
   Promise.all(requests.map(req => req!.toPromise()))
     .then(() => {
       this.handleSendSuccess();
-      this.showNotification(`Message envoyé à ${requests.length} destinataire(s)`, 'success');
+      this.showAlertMessage(`Message envoyé à ${requests.length} destinataire(s)`, 'success');
     })
     .catch(err => {
       console.error('Erreur envoi messages multiples:', err);
-      this.showNotification('Erreur lors de l\'envoi des messages', 'error');
+      this.showAlertMessage('Erreur lors de l\'envoi des messages', 'danger');
     });
 }
 
@@ -451,11 +487,11 @@ private sendToClasse(classeId: number, messageData: any) {
   this.messageService.sendMessage(payload).subscribe({
     next: () => {
       this.handleSendSuccess();
-      this.showNotification('Message envoyé à toute la classe', 'success');
+      this.showAlertMessage('Message envoyé à toute la classe', 'success');
     },
     error: (err) => {
       console.error('Erreur envoi classe:', err);
-      this.showNotification('Erreur lors de l\'envoi à la classe', 'error');
+      this.showAlertMessage('Erreur lors de l\'envoi à la classe', 'danger');
     }
   });
 }
@@ -473,7 +509,7 @@ private sendToAdmin(messageData: any) {
     next: () => this.handleSendSuccess(),
     error: (err) => {
       console.error('Erreur envoi demande admin:', err);
-      this.showNotification('Erreur lors de l\'envoi de la demande', 'error');
+      this.showAlertMessage('Erreur lors de l\'envoi de la demande', 'danger');
     }
   });
 }
@@ -486,7 +522,7 @@ private sendToSingleParentEleve(eleveId: number, messageData: any) {
 
   // Vérification de la présence de l'élève et de son parent_id
   if (!eleve) {
-    this.showNotification(`Erreur: Élève (ID: ${eleveId}) non trouvé.`, 'error');
+    this.showAlertMessage(`Erreur: Élève (ID: ${eleveId}) non trouvé.`, 'danger');
     return;
   }
 
@@ -494,7 +530,7 @@ private sendToSingleParentEleve(eleveId: number, messageData: any) {
   const parentId = eleve.parent_id;
 
   if (!parentId) {
-    this.showNotification(`Erreur: Le parent de l'élève ${eleve.prenom} ${eleve.nom} n'est pas associé.`, 'error');
+    this.showAlertMessage(`Erreur: Le parent de l'élève ${eleve.prenom} ${eleve.nom} n'est pas associé.`, 'danger');
     return;
   }
   const payload = {
@@ -507,7 +543,7 @@ private sendToSingleParentEleve(eleveId: number, messageData: any) {
     next: () => this.handleSendSuccess(),
     error: (err) => {
       console.error('Erreur envoi message:', err);
-      this.showNotification('Erreur lors de l\'envoi du message', 'error');
+      this.showAlertMessage('Erreur lors de l\'envoi du message', 'danger');
     }
   });
 }
@@ -527,11 +563,11 @@ private sendToMultipleEleves(elevesIds: number[], messageData: any) {
   Promise.all(requests.map(req => req.toPromise()))
     .then(() => {
       this.handleSendSuccess();
-      this.showNotification(`Message envoyé à ${elevesIds.length} parents`, 'success');
+      this.showAlertMessage(`Message envoyé à ${elevesIds.length} parents`, 'success');
     })
     .catch(err => {
       console.error('Erreur envoi messages multiples:', err);
-      this.showNotification('Erreur lors de l\'envoi des messages', 'error');
+      this.showAlertMessage('Erreur lors de l\'envoi des messages', 'danger');
     });
 }
 
@@ -572,7 +608,7 @@ private sendToMultipleEleves(elevesIds: number[], messageData: any) {
 
   relancerDemande(demande: DemandeAdmin) {
     // Méthode simulée - à adapter avec votre API réelle
-    this.showNotification('Demande relancée avec succès', 'success');
+    this.showAlertMessage('Demande relancée avec succès', 'success');
   }
 
   getStatutDemandeLabel(statut: string): string {
@@ -688,7 +724,7 @@ getEleves() {
   refreshMessages() {
     this.getMessagesRecus();
     this.getMessagesEnvoyes();
-    this.showNotification('Messages actualisés', 'info');
+    this.showAlertMessage('Messages actualisés', 'info');
   }
 
   marquerCommeLu(id: number) {
@@ -741,7 +777,7 @@ getEleves() {
       console.warn('⚠️ Rôle expéditeur non reconnu:', message.role_expediteur);
       this.typeDestinataire = 'eleve';
       this.messageForm.patchValue({ destinataire_id: '' });
-      this.showNotification('Destinataire non reconnu. Sélectionnez-le manuellement.', 'info');
+      this.showAlertMessage('Destinataire non reconnu. Sélectionnez-le manuellement.', 'danger');
       break;
   }
 
@@ -824,9 +860,7 @@ getEleves() {
     return 'Classe entière';
   }
 
-  private showNotification(message: string, type: 'success' | 'error' | 'info') {
-     console.log(`[${type.toUpperCase()}] ${message}`);
-    }
+
 
     closeMessageModal(): void {
   this.selectedMessage = null;

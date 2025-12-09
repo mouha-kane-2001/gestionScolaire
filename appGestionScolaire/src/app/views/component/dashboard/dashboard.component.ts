@@ -4,19 +4,17 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {
   ButtonDirective,
-  ButtonGroupComponent,
+
   CardBodyComponent,
   CardComponent,
   CardFooterComponent,
   CardHeaderComponent,
   ColComponent,
-  FormCheckLabelDirective,
-  ProgressBarComponent,
-  ProgressComponent,
+
   RowComponent,
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
-import { IconDirective } from '@coreui/icons-angular';
+
 import { UserService } from '../../../services/utilisateur/user.service';
 import { AbsenceService } from '../../../services/absence/absence.service';
 import { ConvocationService } from '../../../services/convocation/convocation.service';
@@ -24,6 +22,7 @@ import { MessageService } from '../../../services/messages/message.service';
 import { NotesService } from '../../../services/note/notes.service';
 import { ReferenceService } from '../../../services/reference/reference.service';
 import { Utilisateur } from '../../../models/utilisateur.model';
+import {  AuthService} from '../../../services/auth/auth.service';
 
 // Interfaces pour le dashboard admin
 interface UtilisateurRecent {
@@ -120,7 +119,10 @@ interface ChartOptions {
     ]
 })
 export class DashboardComponent implements OnInit {
-
+// Dans la classe DashboardComponent
+userPrenom: string = '';
+userNom: string = '';
+userRole: string = '';
 
 
    constructor(
@@ -129,7 +131,8 @@ export class DashboardComponent implements OnInit {
   private absenceService: AbsenceService,
   private convocationService: ConvocationService,
   private messageService: MessageService,
-  private notesService: NotesService
+  private notesService: NotesService,
+  private authService : AuthService
 ) {}
 
   // Données statistiques complètes pour admin
@@ -154,69 +157,15 @@ export class DashboardComponent implements OnInit {
 
   // Données pour l'admin
   activitesRecentes: ActiviteSysteme[] = [
-    {
-      utilisateur: 'Pierre Martin',
-      role: 'professeur',
-      action: 'Saisie de notes - Mathématiques',
-      date: '2024-01-20T14:30:00',
-      statut: 'succès'
-    },
-    {
-      utilisateur: 'Admin System',
-      role: 'admin',
-      action: 'Création utilisateur',
-      date: '2024-01-20T13:15:00',
-      statut: 'succès'
-    },
-    {
-      utilisateur: 'Marie Dubois',
-      role: 'professeur',
-      action: 'Envoi message aux parents',
-      date: '2024-01-20T11:45:00',
-      statut: 'succès'
-    }
+
   ];
 
   alertesUrgentes: AlerteUrgente[] = [
-    {
-      titre: 'Serveur surchargé',
-      description: 'Utilisation CPU à 95%',
-      date: '2024-01-20T15:20:00',
-      niveau: 'critique'
-    },
-    {
-      titre: 'Sauvegarde échouée',
-      description: 'Échec de la sauvegarde nocturne',
-      date: '2024-01-20T08:30:00',
-      niveau: 'important'
-    }
+
   ];
 
   utilisateursRecents: UtilisateurRecent[] = [
-    {
-      id: 1,
-      prenom: 'Sophie',
-      nom: 'Leroy',
-      email: 'sophie.leroy@ecole.fr',
-      role: 'professeur',
-      dateCreation: '2024-01-19'
-    },
-    {
-      id: 2,
-      prenom: 'Thomas',
-      nom: 'Bernard',
-      email: 'thomas.bernard@ecole.fr',
-      role: 'eleve',
-      dateCreation: '2024-01-18'
-    },
-    {
-      id: 3,
-      prenom: 'Nathalie',
-      nom: 'Petit',
-      email: 'nathalie.petit@parent.fr',
-      role: 'parent',
-      dateCreation: '2024-01-17'
-    }
+
   ];
 
   statsSysteme: StatsSysteme = {
@@ -335,26 +284,51 @@ export class DashboardComponent implements OnInit {
 
    this.loadStats();
   this.loadUtilisateursRecents();
-   this.loadPerformance();
+   this.loadCurrentUser();
   this.loadTauxAbsences();
   this.loadMessagesUrgents();
 }
 
+// Nouvelle méthode pour charger l'utilisateur connecté
 
- loadPerformance(): void {
-  this.referenceService.getPerformanceClasses().subscribe(data => {
+ // Méthode pour charger l'utilisateur connecté
+loadCurrentUser(): void {
+  const userInfo = this.authService.getUserInfo();
 
-    this.chartData.performance = {
-      labels: data.map(c => c.nom),
-      datasets: [
-        {
-          label: 'Moyenne classe',
-          backgroundColor: '#321fdb',
-          data: data.map(c => c.moyenne)
-        }
-      ]
-    };
-  });
+  if (userInfo.nomUtilisateur) {
+    // Séparer le nom et prénom (format "Nom Prénom")
+    const nomComplet = userInfo.nomUtilisateur.split(' ');
+    if (nomComplet.length >= 2) {
+      this.userNom = nomComplet[0]; // Nom de famille
+      this.userPrenom = nomComplet.slice(1).join(' '); // Prénom (peut être composé)
+    } else {
+      this.userNom = userInfo.nomUtilisateur;
+      this.userPrenom = '';
+    }
+
+    // Déterminer le rôle avec libellé plus explicite
+    switch(userInfo.typeUtilisateur?.toLowerCase()) {
+      case 'admin':
+        this.userRole = 'Administrateur';
+        break;
+      case 'prof':
+        this.userRole = 'Professeur';
+        break;
+      case 'eleve':
+        this.userRole = 'Élève';
+        break;
+      case 'parent':
+        this.userRole = 'Parent';
+        break;
+      default:
+        this.userRole = userInfo.typeUtilisateur || 'Utilisateur';
+    }
+  } else {
+    // Valeurs par défaut si aucune info trouvée
+    this.userPrenom = 'Utilisateur';
+    this.userNom = '';
+    this.userRole = 'Administrateur';
+  }
 }
 
 loadTauxAbsences(): void {

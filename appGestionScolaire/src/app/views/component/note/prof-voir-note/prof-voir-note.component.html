@@ -1,0 +1,183 @@
+<div class="container-fluid p-3">
+  <!-- Header compact -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="fw-bold mb-0">📋 Consultation des Notes</h5>
+          <small class="text-muted">Visualisez les notes attribuées</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres compact -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card border">
+        <div class="card-body py-3">
+          <div class="row g-2 align-items-end">
+            <div class="col-md">
+              <label class="form-label fw-semibold small mb-1">Classe</label>
+              <select [(ngModel)]="selectedClasseId" (change)="onFiltresChange()" class="form-select form-select-sm">
+                <option value="">Choisir classe</option>
+                <option *ngFor="let classe of classes" [value]="classe.id">{{ classe.nom }}</option>
+              </select>
+            </div>
+            <div class="col-md">
+              <label class="form-label fw-semibold small mb-1">Matière</label>
+              <select [(ngModel)]="selectedMatiereId" (change)="onFiltresChange()" class="form-select form-select-sm">
+                <option value="">Choisir matière</option>
+                <option *ngFor="let matiere of matieres" [value]="matiere.id">{{ matiere.nom }}</option>
+              </select>
+            </div>
+            <div class="col-md">
+              <label class="form-label fw-semibold small mb-1">Type</label>
+              <select [(ngModel)]="selectedType" (change)="onFiltresChange()" class="form-select form-select-sm">
+                <option *ngFor="let type of typesNote" [value]="type.value">{{ type.label }}</option>
+              </select>
+            </div>
+            <div class="col-md">
+              <label class="form-label fw-semibold small mb-1">Période</label>
+              <select [(ngModel)]="selectedPeriode" (change)="onFiltresChange()" class="form-select form-select-sm">
+                <option *ngFor="let periode of periodes" [value]="periode.value">{{ periode.label }}</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button (click)="chargerNotes()" [disabled]="!selectedClasseId || !selectedMatiereId || isLoading"
+                      class="btn btn-sm btn-primary w-100">
+                <i class="fas fa-search" [class.fa-spin]="isLoading"></i> Rechercher
+              </button>
+            </div>
+          </div>
+
+          <!-- Numéro devoir si type=devoir -->
+          <div *ngIf="selectedType === 'devoir'" class="row mt-2">
+            <div class="col-md-3">
+              <label class="form-label fw-semibold small mb-1">N° Devoir</label>
+              <select [(ngModel)]="selectedNumero" (change)="onFiltresChange()" class="form-select form-select-sm">
+                <option [value]="undefined">Tous</option>
+                <option *ngFor="let numero of numerosDevoir" [value]="numero">Devoir {{ numero }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau compact -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card border">
+        <div class="card-header bg-light py-2">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Liste des élèves</h6>
+            <div class="d-flex align-items-center gap-2">
+              <button (click)="exporterNotes()" class="btn btn-sm btn-outline-success">
+                <i class="fas fa-file-export"></i> Exporter
+              </button>
+              <button (click)="modifierNotesEnMasse()" class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i> Modifier tous les notes
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-3 py-2">Élève</th>
+                  <th class="py-2">Matricule</th>
+                  <th class="py-2">Note /20</th>
+                  <th class="py-2">Appréciation</th>
+                  <th class="py-2">Date</th>
+                  <th class="pe-3 py-2 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let eleve of elevesAvecNotes">
+                  <td class="ps-3 py-2">
+                    <div class="fw-semibold">{{ eleve.nom_complet }}</div>
+                  </td>
+                  <td class="py-2">
+                    <small class="text-muted">{{ eleve.matricule }}</small>
+                  </td>
+                  <td class="py-2">
+                    <span *ngIf="eleve.note_existante"
+                          [class]="'badge ' + getNoteColor(eleve.note_existante.valeur)">
+                      {{ eleve.note_existante.valeur }}
+                    </span>
+                    <span *ngIf="!eleve.note_existante" class="badge bg-secondary">Non noté</span>
+                  </td>
+                  <td class="py-2">
+                    <span *ngIf="eleve.note_existante" class="small">
+                      {{ getAppreciation(eleve.note_existante.valeur) }}
+                    </span>
+                    <span *ngIf="!eleve.note_existante" class="text-muted small">-</span>
+                  </td>
+                  <td class="py-2">
+                    <span *ngIf="eleve.note_existante?.date" class="small">
+                      {{ formatDate(eleve.note_existante?.date) }}
+                    </span>
+                    <span *ngIf="!eleve.note_existante?.date" class="text-muted small">-</span>
+                  </td>
+                  <td class="pe-3 py-2 text-center">
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button *ngIf="eleve.note_existante" (click)="modifierNotesEnMasse()"
+                              class="btn btn-outline-primary btn-sm" title="Modifier">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button *ngIf="eleve.note_existante" (click)="supprimerNote(eleve.note_existante.id)"
+                              class="btn btn-outline-danger btn-sm" title="Supprimer">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Message si aucune donnée -->
+          <div *ngIf="elevesAvecNotes.length === 0 && selectedClasseId && selectedMatiereId"
+               class="text-center py-4">
+            <div class="text-muted">
+              <i class="fas fa-file-alt fa-2x mb-2"></i>
+              <p class="mb-1">Aucune note trouvée</p>
+              <p class="small text-muted">Aucune note attribuée pour ces critères</p>
+              <button (click)="modifierNotesEnMasse()" class="btn btn-sm btn-primary mt-2">
+                <i class="fas fa-plus-circle"></i> Attribuer des notes
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="!selectedClasseId || !selectedMatiereId" class="text-center py-4">
+            <div class="text-muted">
+              <i class="fas fa-search fa-2x mb-2"></i>
+              <p class="mb-0">Sélectionnez une classe et une matière</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer tableau -->
+        <div class="card-footer bg-light py-2">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="small text-muted">
+              {{ elevesAvecNotes.length }} élève(s) affiché(s)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading -->
+<div *ngIf="isLoading" class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-25 d-flex align-items-center justify-content-center" style="z-index: 1050;">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Chargement...</span>
+  </div>
+</div>

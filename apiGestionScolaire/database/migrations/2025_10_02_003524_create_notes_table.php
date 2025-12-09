@@ -12,11 +12,13 @@ class CreateNotesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('eleve_id');
             $table->unsignedBigInteger('matiere_id');
+            $table->unsignedBigInteger('classe_id');
             $table->enum('type', ['devoir', 'examen'])->default('devoir');
             $table->decimal('valeur', 5, 2);
             $table->string('periode')->nullable();
+              $table->integer('numero')->nullable();
             $table->timestamps();
-
+            $table->foreign('classe_id')->references('id')->on('classes')->onDelete('cascade');
             $table->foreign('eleve_id')->references('id')->on('eleves')->onDelete('cascade');
             $table->foreign('matiere_id')->references('id')->on('matieres')->onDelete('cascade');
         });

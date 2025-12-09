@@ -4,6 +4,7 @@ import { AdminLayoutComponent } from './layout/admin-layout/admin-layout.compone
  import { ProfLayoutComponent } from './layout/prof-layout/prof-layout.component';
 import { ParentLayoutComponent } from './layout/parent-layout/parent-layout.component';
 import { EleveLayoutComponent } from './layout/eleve-layout/eleve-layout.component';
+import { authGuard } from './guards/auth.guard';
  export const routes: Routes = [
   {
     path: '',
@@ -12,8 +13,9 @@ import { EleveLayoutComponent } from './layout/eleve-layout/eleve-layout.compone
   },
   {
     path: '',
-    component: AdminLayoutComponent,
-
+     component: AdminLayoutComponent,
+  canActivate: [authGuard],
+data: { role: 'ADMIN' },
 
     children: [
       {

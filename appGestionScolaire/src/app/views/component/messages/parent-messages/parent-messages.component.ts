@@ -24,6 +24,42 @@ interface Professeur {
   styleUrls: ['./parent-messages.component.scss']
 })
 export class ParentMessagesComponent implements OnInit {
+
+
+  // PROPRIÉTÉS POUR LES ALERTES
+  showAlert = false;
+  alertType: 'success' | 'danger' | 'warning' | 'info' = 'success';
+  alertMessage = '';
+  alertTimeout: any = null;
+
+    // MÉTHODES POUR LES ALERTES
+  showAlertMessage(message: string, type: 'success' | 'danger' | 'warning' | 'info' = 'info', duration: number = 5000) {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlert = true;
+
+    // Annuler l'alerte précédente si elle existe
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+    }
+
+    // Auto-fermeture après la durée spécifiée
+    this.alertTimeout = setTimeout(() => {
+      this.closeAlert();
+    }, duration);
+  }
+
+  closeAlert() {
+    this.showAlert = false;
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+      this.alertTimeout = null;
+    }
+  }
+
+
+
+
   messageForm!: FormGroup;
   professeurs: Professeur[] = [];
   messagesRecus: Message[] = [];
@@ -153,7 +189,7 @@ export class ParentMessagesComponent implements OnInit {
 const prof = this.professeurs.find(p => p.user_id === profId); // ou p.id selon ce que tu veux
 
     if (!prof) {
-      this.showNotification('Veuillez sélectionner un professeur', 'error');
+      this.showAlertMessage('Veuillez sélectionner un professeur', 'danger');
       return;
     }
 
@@ -168,7 +204,7 @@ const prof = this.professeurs.find(p => p.user_id === profId); // ou p.id selon 
 
     this.messageService.sendMessage(messageData).subscribe({
       next: () => {
-        this.showNotification('Message envoyé avec succès', 'success');
+        this.showAlertMessage('Message envoyé avec succès', 'success');
         this.messageForm.reset({
           destinataire_type: 'prof',
           priorite: 'normal'
@@ -179,7 +215,7 @@ const prof = this.professeurs.find(p => p.user_id === profId); // ou p.id selon 
       },
       error: (err) => {
         console.error('Erreur envoi message:', err);
-        this.showNotification('Erreur lors de l\'envoi du message', 'error');
+        this.showAlertMessage('Erreur lors de l\'envoi du message', 'danger');
       }
     });
   }
@@ -292,7 +328,7 @@ const prof = this.professeurs.find(p => p.user_id === profId); // ou p.id selon 
   refreshMessages(): void {
     this.getMessagesRecus();
     this.getMessagesEnvoyes();
-    this.showNotification('Messages actualisés', 'info');
+    this.showAlertMessage('Messages actualisés', 'info');
   }
 
   marquerCommeLu(messageId: number): void {
@@ -371,7 +407,7 @@ repondreMessage(message: Message): void {
         destinataire_type: 'prof',
         destinataire_id: ''
       });
-      this.showNotification('Destinataire non reconnu. Sélectionnez-le manuellement.', 'info');
+      this.showAlertMessage('Destinataire non reconnu. Sélectionnez-le manuellement.', 'info');
       break;
   }
 
@@ -398,11 +434,7 @@ repondreMessage(message: Message): void {
     }
   }
 
-  private showNotification(message: string, type: 'success' | 'error' | 'info'): void {
-    // Implémentez votre système de notification
 
-    alert(message);
-  }
 
      closeMessageModal(): void {
   this.selectedMessage = null;

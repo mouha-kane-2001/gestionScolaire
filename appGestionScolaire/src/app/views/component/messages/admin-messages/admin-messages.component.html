@@ -1,4 +1,12 @@
 <div class="messaging-container">
+   <div *ngIf="showAlert"
+                 class="alert"
+                 [ngClass]="{'alert-success': alertType==='success', 'alert-danger': alertType==='danger'}"
+                 role="alert">
+              {{ alertMessage }}
+              <button type="button" class="btn-close" (click)="closeAlert()"></button>
+            </div>
+
   <!-- Header compact -->
   <header class="compact-header">
     <div class="header-content">

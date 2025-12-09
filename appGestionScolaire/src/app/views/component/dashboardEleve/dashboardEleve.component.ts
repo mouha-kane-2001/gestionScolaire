@@ -94,6 +94,8 @@ export class DashboardEleveComponent implements OnInit {
   ) {}
 
   eleves: Eleve | null = null;
+ userPrenom: string = '';
+userNom: string = '';
 
   stats: EleveStats = {
     moyenneGenerale: 14.2, // reste fixe
@@ -111,7 +113,26 @@ export class DashboardEleveComponent implements OnInit {
   ngOnInit(): void {
     this.loadEleveData();
     this.loadMessages();
+    this.loadUserInfo();
   }
+  // Nouvelle méthode pour charger les infos utilisateur
+loadUserInfo(): void {
+  const userInfo = this.authService.getUserInfo();
+
+  if (userInfo.nomUtilisateur) {
+    const nomComplet = userInfo.nomUtilisateur.split(' ');
+    if (nomComplet.length >= 2) {
+      this.userNom = nomComplet[0];
+      this.userPrenom = nomComplet.slice(1).join(' ');
+    } else {
+      this.userNom = userInfo.nomUtilisateur;
+      this.userPrenom = '';
+    }
+  } else {
+    this.userPrenom = 'Parent';
+    this.userNom = '';
+  }
+}
 
 
 
@@ -257,4 +278,11 @@ loadMessages(): void {
     if (note >= 10) return 'text-warning';
     return 'text-danger';
   }
+
+getInitials(prenom?: string, nom?: string): string {
+  if (!prenom && !nom) return 'EL';
+  return `${prenom?.charAt(0) || ''}${nom?.charAt(0) || ''}`.toUpperCase();
+}
+
+
 }

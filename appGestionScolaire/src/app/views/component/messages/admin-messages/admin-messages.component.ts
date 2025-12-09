@@ -44,6 +44,43 @@ interface DemandeAdmin {
   standalone: true
 })
 export class AdminMessagesComponent implements OnInit {
+
+
+  // PROPRIÉTÉS POUR LES ALERTES
+  showAlert = false;
+  alertType: 'success' | 'danger' | 'warning' | 'info' = 'success';
+  alertMessage = '';
+  alertTimeout: any = null;
+
+    // MÉTHODES POUR LES ALERTES
+  showAlertMessage(message: string, type: 'success' | 'danger' | 'warning' | 'info' = 'info', duration: number = 5000) {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlert = true;
+
+    // Annuler l'alerte précédente si elle existe
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+    }
+
+    // Auto-fermeture après la durée spécifiée
+    this.alertTimeout = setTimeout(() => {
+      this.closeAlert();
+    }, duration);
+  }
+
+  closeAlert() {
+    this.showAlert = false;
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+      this.alertTimeout = null;
+    }
+  }
+
+
+
+
+
   messagesRecus: Message[] = [];
   messagesEnvoyes: Message[] = [];
   filteredMessages: Message[] = [];
@@ -127,7 +164,7 @@ repondreMessage(message: Message): void {
           console.log(`- ${e.prenom} ${e.nom}: parent_id=${e.parent.user_id}`);
         }
       });
-      this.showNotification('Destinataire non trouvé, veuillez le sélectionner manuellement', 'info');
+      this.showAlertMessage('Destinataire non trouvé, veuillez le sélectionner manuellement', 'danger');
     }
   } else {
     console.warn('Role expéditeur non géré:', message.role_expediteur);
@@ -299,7 +336,7 @@ closeMessageModal(): void {
     this.getMessagesEnvoyes();
     this.currentSection = 'envoyes';
 
-    this.showNotification('Message envoyé avec succès', 'success');
+    this.showAlertMessage('Message envoyé avec succès', 'success');
   }
 
   filterElevesParClasse(classeNom?: string): void {
@@ -345,7 +382,7 @@ closeMessageModal(): void {
         if (formValue.destinataire_id) {
           this.sendToSingleEleve(formValue.destinataire_id, messageData);
         } else {
-          this.showNotification('Veuillez sélectionner un élève', 'error');
+          this.showAlertMessage('Veuillez sélectionner un élève', 'danger');
         }
         break;
 
@@ -354,7 +391,7 @@ closeMessageModal(): void {
         if (formValue.classe_id) {
           this.sendToClasse(formValue.classe_id, messageData);
         } else {
-          this.showNotification('Veuillez sélectionner une classe', 'error');
+          this.showAlertMessage('Veuillez sélectionner une classe', 'danger');
         }
         break;
 
@@ -364,7 +401,7 @@ closeMessageModal(): void {
         if (formValue.destinataire_id) {
           this.sendToSingleProf(formValue.destinataire_id, messageData);
         } else {
-          this.showNotification('Veuillez sélectionner un professeur', 'error');
+          this.showAlertMessage('Veuillez sélectionner un professeur', 'danger');
         }
         break;
 
@@ -391,7 +428,7 @@ closeMessageModal(): void {
 
   // Vérification de la présence de l'élève et de son parent_id
   if (!eleve) {
-    this.showNotification(`Erreur: eleves (ID: ${eleveId}) non trouvé.`, 'error');
+    this.showAlertMessage(`Erreur: eleves (ID: ${eleveId}) non trouvé.`, 'danger');
     return;
   }
 
@@ -399,7 +436,7 @@ closeMessageModal(): void {
   const parentId = eleve.parent?.user_id;
 
   if (!parentId) {
-    this.showNotification(`Erreur: Le parent de l'élève ${eleve.prenom} ${eleve.nom} n'est pas associé.`, 'error');
+    this.showAlertMessage(`Erreur: Le parent de l'élève ${eleve.prenom} ${eleve.nom} n'est pas associé.`, 'danger');
     return;
   }
     const payload = {
@@ -412,7 +449,7 @@ closeMessageModal(): void {
       next: () => this.handleSendSuccess(),
       error: (err) => {
         console.error('Erreur envoi message:', err);
-        this.showNotification('Erreur lors de l\'envoi du message', 'error');
+        this.showAlertMessage('Erreur lors de l\'envoi du message', 'danger');
       }
     });
   }
@@ -425,7 +462,7 @@ closeMessageModal(): void {
   const prof = this.professeurs.find(p => p.id === profIdNumber);
   console.log(' prof trouvé :', prof);
   if (!prof) {
-    this.showNotification('Professeur introuvable xxxx !', 'error');
+    this.showAlertMessage('Professeur introuvable xxxx !', 'danger');
     return;
   }
 
@@ -439,7 +476,7 @@ closeMessageModal(): void {
       next: () => this.handleSendSuccess(),
       error: (err) => {
         console.error('Erreur envoi message:', err);
-        this.showNotification('Erreur lors de l\'envoi du message', 'error');
+        this.showAlertMessage('Erreur lors de l\'envoi du message', 'danger');
       }
     });
   }
@@ -458,11 +495,11 @@ closeMessageModal(): void {
   this.messageService.sendMessage(payload).subscribe({
     next: () => {
       this.handleSendSuccess();
-      this.showNotification('Message envoyé à toute la classe', 'success');
+      this.showAlertMessage('Message envoyé à toute la classe', 'success');
     },
     error: (err) => {
       console.error('Erreur envoi classe:', err);
-      this.showNotification('Erreur lors de l\'envoi à la classe', 'error');
+      this.showAlertMessage('Erreur lors de l\'envoi à la classe', 'danger');
     }
   });
 }
@@ -478,11 +515,11 @@ closeMessageModal(): void {
     this.messageService.sendMessage(payload).subscribe({
       next: () => {
         this.handleSendSuccess();
-        this.showNotification('Message envoyé à tous les parents d\'élèves', 'success');
+        this.showAlertMessage('Message envoyé à tous les parents d\'élèves', 'success');
       },
       error: (err) => {
         console.error('Erreur envoi tous élèves:', err);
-        this.showNotification('Erreur lors de l\'envoi à tous les élèves', 'error');
+        this.showAlertMessage('Erreur lors de l\'envoi à tous les élèves', 'danger');
       }
     });
   }
@@ -498,11 +535,11 @@ closeMessageModal(): void {
     this.messageService.sendMessage(payload).subscribe({
       next: () => {
         this.handleSendSuccess();
-        this.showNotification('Message envoyé à tous les professeurs', 'success');
+        this.showAlertMessage('Message envoyé à tous les professeurs', 'success');
       },
       error: (err) => {
         console.error('Erreur envoi tous profs:', err);
-        this.showNotification('Erreur lors de l\'envoi à tous les professeurs', 'error');
+        this.showAlertMessage('Erreur lors de l\'envoi à tous les professeurs', 'danger');
       }
     });
   }
@@ -586,7 +623,7 @@ closeMessageModal(): void {
   refreshMessages(): void {
     this.getMessagesRecus();
     this.getMessagesEnvoyes();
-    this.showNotification('Messages actualisés', 'info');
+    this.showAlertMessage('Messages actualisés', 'info');
   }
 
   marquerCommeLu(id: number): void {
@@ -693,10 +730,7 @@ getClasseName(classeId: number): string {
     return 'Groupe';
   }
 
-  private showNotification(message: string, type: 'success' | 'error' | 'info'): void {
-    // Implémentez votre système de notification
-    console.log(`${type.toUpperCase()}: ${message}`);
-  }
+
 
 
 

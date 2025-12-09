@@ -14,6 +14,8 @@ class Note extends Model
         'type',
         'valeur',
         'periode',
+        'numero',
+        'classe_id'
     ];
 
     // Relation avec Eleve
@@ -27,4 +29,10 @@ class Note extends Model
     {
         return $this->belongsTo(Matiere::class);
     }
+    //Relation avec classe
+
+    public function classe()
+{
+    return $this->belongsTo(Classe::class);
+}
 }

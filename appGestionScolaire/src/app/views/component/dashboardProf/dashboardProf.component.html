@@ -1,133 +1,205 @@
 <div class="dashboard-prof">
-  <!-- En-tête avec stats rapides -->
-  <div class="dashboard-header mb-5">
-    <div class="header-content">
-      <h1 class="dashboard-title">Tableau de Bord</h1>
-      <p class="dashboard-subtitle">Vue d'ensemble de vos classes et activités</p>
-    </div>
-    <div class="stats-container">
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="cil-school"></i>
-        </div>
-        <div class="stat-content">
-          <span class="number">{{ classes.length }}</span>
-          <span class="label">Classes</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="cil-user"></i>
-        </div>
-        <div class="stat-content">
-          <span class="number">{{ getTotalEleves() }}</span>
-          <span class="label">Élèves</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="cil-warning"></i>
-        </div>
-        <div class="stat-content">
-          <span class="number">{{ getTotalAbsences() }}</span>
-          <span class="label">Absences</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Loading state -->
-  <div *ngIf="isLoading" class="loading-container">
-    <div class="spinner">
-      <div class="spinner-circle"></div>
-    </div>
-    <p class="loading-text">Chargement des données...</p>
-  </div>
-
-  <!-- Contenu principal -->
-  <div *ngIf="!isLoading" class="dashboard-content">
-    <!-- Mes classes -->
-    <div class="section-card">
-      <div class="section-header">
-        <h2 class="section-title">Mes classes</h2>
-        <button class="btn-primary" routerLink="/prof/classes">
-          Voir toutes les classes
-        </button>
-      </div>
-      <div class="section-body">
-        <div class="classes-grid">
-          <div *ngFor="let classe of classes" class="class-card">
-            <div class="class-header">
-              <h3 class="class-name">{{ classe.nom }}</h3>
-            </div>
-            <div class="class-stats">
-              <div class="class-stat">
-                <span class="stat-value">{{ classe.nombreEleves }}</span>
-                <span class="stat-label">Élèves</span>
-              </div>
-              <div class="class-stat">
-                <span class="stat-value">{{ classe.absences }}</span>
-                <span class="stat-label">Absences</span>
+  <!-- En-tête élégant avec fond gradient -->
+  <div class="prof-header mb-4">
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="d-flex align-items-center">
+            <div class="avatar-container me-3">
+              <div class="prof-avatar bg-gradient-primary">
+                <i class="cil-education"></i>
               </div>
             </div>
-            <button class="btn-outline class-action" [routerLink]="['/prof/classe', classe.id]">
-              Voir détails
+            <div>
+              <h1 class="prof-title mb-1">Tableau de bord</h1>
+              <div class="prof-info">
+                <span class="prof-name">{{ userPrenom }} {{ userNom }}</span>
+                <span class="prof-badge">Professeur</span>
+                <span class="prof-stats">
+                  <i class="cil-school me-1"></i>{{ classes.length }} classes
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="prof-actions d-flex justify-content-end gap-2">
+            <button class="btn btn-light btn-icon" routerLink="/prof/notes">
+              <i class="cil-clipboard"></i>
+              <span>Saisir notes</span>
+            </button>
+            <button class="btn btn-light btn-icon" routerLink="/prof/absences">
+              <i class="cil-calendar"></i>
+              <span>Gérer absences</span>
+            </button>
+            <button class="btn btn-light btn-icon" routerLink="/prof/messages">
+              <i class="cil-envelope-open"></i>
+              <span>Messages</span>
             </button>
           </div>
         </div>
-        <div *ngIf="classes.length === 0" class="empty-state">
-          <div class="empty-icon">
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistiques principales -->
+  <div class="container-fluid mb-4">
+    <div class="row g-3">
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-card stat-primary">
+          <div class="stat-icon">
             <i class="cil-school"></i>
           </div>
-          <p class="empty-text">Aucune classe assignée</p>
+          <div class="stat-content">
+            <div class="stat-number">{{ classes.length }}</div>
+            <div class="stat-label">Classes assignées</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-card stat-info">
+          <div class="stat-icon">
+            <i class="cil-people"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ getTotalEleves() }}</div>
+            <div class="stat-label">Élèves total</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-card stat-warning">
+          <div class="stat-icon">
+            <i class="cil-warning"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ getTotalAbsences() }}</div>
+            <div class="stat-label">Absences total</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-card stat-success">
+          <div class="stat-icon">
+            <i class="cil-chart"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ messagesRecus.length }}</div>
+            <div class="stat-label">Messages reçus</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="container-fluid">
+    <!-- Mes classes -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">
+          <i class="cil-school me-2"></i>
+          Mes classes
+        </h5>
+        <a routerLink="/prof/classes" class="btn btn-sm btn-outline-primary">
+          Voir toutes <i class="cil-arrow-right ms-1"></i>
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div *ngFor="let classe of classes" class="col-md-4 col-sm-6">
+            <div class="class-card">
+              <div class="class-header">
+                <h6 class="class-title">{{ classe.nom }}</h6>
+                <div class="class-status">
+                  <span class="badge bg-primary">Active</span>
+                </div>
+              </div>
+              <div class="class-body">
+                <div class="class-stats">
+                  <div class="class-stat">
+                    <i class="cil-user"></i>
+                    <span>{{ classe.nombreEleves }} élèves</span>
+                  </div>
+                  <div class="class-stat">
+                    <i class="cil-warning"></i>
+                    <span>{{ classe.absences }} absences</span>
+                  </div>
+                </div>
+                <div class="class-actions">
+                  <button class="btn btn-sm btn-outline-primary w-100" [routerLink]="['/prof/classe', classe.id]">
+                    <i class="cil-list me-1"></i>
+                    Voir détails
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="classes.length === 0" class="col-12">
+            <div class="empty-state text-center py-5">
+              <div class="empty-icon mb-3">
+                <i class="cil-school text-muted" style="font-size: 3rem;"></i>
+              </div>
+              <h5 class="text-muted">Aucune classe assignée</h5>
+              <p class="text-muted mb-0">Vous n'avez pas encore de classes assignées.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="dashboard-columns">
-      <!-- Graphique des absences -->
-      <div class="section-card">
-        <div class="section-header">
-          <h2 class="section-title">Absences par classe</h2>
-        </div>
-        <div class="section-body">
-          <div *ngIf="classes.length > 0" class="chart-container">
-            <c-chart type="bar" [data]="chartData.absences" [options]="chartOptions.absences"></c-chart>
+    <!-- Graphique et messages -->
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="card h-100">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i class="cil-chart me-2"></i>
+              Absences par classe
+            </h5>
           </div>
-          <div *ngIf="classes.length === 0" class="empty-state">
-            <p>Aucune donnée à afficher</p>
+          <div class="card-body">
+            <div *ngIf="classes.length > 0" class="chart-container" style="height: 300px;">
+              <c-chart type="bar" [data]="chartData.absences" [options]="chartOptions.absences"></c-chart>
+            </div>
+            <div *ngIf="classes.length === 0" class="empty-state text-center py-5">
+              <p class="text-muted">Aucune donnée à afficher</p>
+            </div>
           </div>
         </div>
       </div>
-
-      <!-- Derniers messages -->
-      <div class="section-card">
-        <div class="section-header">
-          <h2 class="section-title">Derniers messages</h2>
-          <button class="btn-outline" routerLink="/prof/messages">
-            Voir tous
-          </button>
-        </div>
-        <div class="section-body">
-          <div class="messages-list">
-            <div *ngFor="let message of messagesRecus" class="message-item">
-              <div class="message-header">
-                <div class="sender-info">
-                  <div class="sender-avatar">
-                    {{ message.expediteur.charAt(0) }}
-                  </div>
-                  <strong class="sender-name">{{ message.expediteur }}</strong>
-                </div>
-                <span class="message-date">{{ formatDate(message.date) }}</span>
-              </div>
-              <div class="message-content">{{ message.message }}</div>
-            </div>
+      <div class="col-lg-4">
+        <div class="card h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+              <i class="cil-envelope-open me-2"></i>
+              Derniers messages
+            </h5>
+            <a routerLink="/prof/messages" class="btn btn-sm btn-outline-primary">
+              Voir tous
+            </a>
           </div>
-          <div *ngIf="messagesRecus.length === 0" class="empty-state">
-            <div class="empty-icon">
-              <i class="cil-envelope-open"></i>
+          <div class="card-body p-0">
+            <div class="messages-list">
+              <div *ngFor="let message of messagesRecus" class="message-item">
+                <div class="message-avatar">
+                  {{ message.expediteur.charAt(0) }}
+                </div>
+                <div class="message-content">
+                  <div class="message-header">
+                    <strong class="message-sender">{{ message.expediteur }}</strong>
+                    <small class="message-date text-muted">{{ formatDate(message.date) }}</small>
+                  </div>
+                  <p class="message-text mb-0">{{ message.message | slice:0:60 }}{{ message.message.length > 60 ? '...' : '' }}</p>
+                </div>
+              </div>
+              <div *ngIf="messagesRecus.length === 0" class="empty-state text-center py-5">
+                <div class="empty-icon mb-3">
+                  <i class="cil-envelope-open text-muted" style="font-size: 2rem;"></i>
+                </div>
+                <p class="text-muted mb-0">Aucun message</p>
+              </div>
             </div>
-            <p class="empty-text">Aucun message</p>
           </div>
         </div>
       </div>

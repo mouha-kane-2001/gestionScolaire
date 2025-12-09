@@ -22,7 +22,7 @@ class UserRequest extends FormRequest
      */
    public function rules(): array
 {
-    $userId = $this->route('id'); // récupère l'id depuis l'URL
+    $userId = $this->route('utilisateur'); // récupère l'id depuis l'URL
 
     return [
              'prenom' => 'required|string|max:255',

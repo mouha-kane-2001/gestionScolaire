@@ -38,14 +38,8 @@ interface MessageRecu {
   imports: [
     CommonModule,
     RouterModule,
-    ButtonDirective,
-    CardBodyComponent,
-    CardComponent,
-    CardHeaderComponent,
-    ColComponent,
-    RowComponent,
     ChartjsComponent,
-  
+
   ]
 })
 export class DashboardProfComponent implements OnInit {
@@ -61,6 +55,8 @@ export class DashboardProfComponent implements OnInit {
   classes: ClasseProf[] = [];
   messagesRecus: MessageRecu[] = [];
   isLoading = true;
+  userPrenom: string = '';
+userNom: string = '';
 
   chartData = {
     absences: {
@@ -90,7 +86,27 @@ export class DashboardProfComponent implements OnInit {
   ngOnInit(): void {
     this.loadClasses();
     this.loadMessages();
+    this.loadUserInfo();
   }
+
+  // Nouvelle méthode pour charger les infos utilisateur
+loadUserInfo(): void {
+  const userInfo = this.authService.getUserInfo();
+
+  if (userInfo.nomUtilisateur) {
+    const nomComplet = userInfo.nomUtilisateur.split(' ');
+    if (nomComplet.length >= 2) {
+      this.userNom = nomComplet[0];
+      this.userPrenom = nomComplet.slice(1).join(' ');
+    } else {
+      this.userNom = userInfo.nomUtilisateur;
+      this.userPrenom = '';
+    }
+  } else {
+    this.userPrenom = 'Professeur';
+    this.userNom = '';
+  }
+}
 
  loadClasses(): void {
   if (this.classes.length > 0) return; // déjà chargé

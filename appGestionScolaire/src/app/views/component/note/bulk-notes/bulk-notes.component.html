@@ -1,0 +1,271 @@
+<div class="bulk-notes-container">
+  <!-- En-tête élégant -->
+  <div class="page-header">
+    <!-- ... header content ... -->
+  </div>
+
+  <!-- Statistiques en bandeau -->
+  <div class="stats-banner" *ngIf="eleves.length > 0">
+    <!-- ... stats content ... -->
+  </div>
+
+  <!-- Carte principale -->
+  <div class="main-card">
+    <!-- FORMULAIRE AVEC formGroup -->
+    <form [formGroup]="bulkForm" (ngSubmit)="onSubmit()" class="note-form">
+
+      <!-- Section Paramètres -->
+      <div class="card-section">
+        <div class="section-title">
+          <i class="fas fa-cog"></i>
+          <h3>Paramètres d'évaluation</h3>
+        </div>
+
+        <div class="form-grid">
+          <!-- Classe -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-chalkboard-teacher"></i>
+              Classe *
+            </label>
+            <div class="select-wrapper">
+              <select
+                formControlName="classe_id"
+                class="form-select"
+                (change)="onClasseChange($event)">
+                <option value="" disabled selected>Choisir une classe...</option>
+                <option *ngFor="let classe of classes" [value]="classe.id">
+                  🏫 {{ classe.nom }}
+                </option>
+              </select>
+              <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+            <div class="form-error" *ngIf="f['classe_id'].touched && f['classe_id'].invalid">
+              Sélectionnez une classe
+            </div>
+          </div>
+
+          <!-- Matière -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-book"></i>
+              Matière *
+            </label>
+            <div class="select-wrapper">
+              <select formControlName="matiere_id" class="form-select">
+                <option value="" disabled selected>Sélectionner une matière...</option>
+                <option *ngFor="let matiere of matieres" [value]="matiere.id">
+                  📚 {{ matiere.nom }}
+                </option>
+              </select>
+              <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+          </div>
+
+          <!-- Type d'évaluation -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-clipboard-check"></i>
+              Type *
+            </label>
+            <div class="select-wrapper">
+              <select formControlName="type" class="form-select">
+                <option *ngFor="let type of typesNote" [value]="type.value">
+                  {{ type.value === 'devoir' ? '📝 ' : '📋 ' }}{{ type.label }}
+                </option>
+              </select>
+              <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+          </div>
+
+          <!-- Période -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-calendar-alt"></i>
+              Période *
+            </label>
+            <div class="select-wrapper">
+              <select formControlName="periode" class="form-select">
+                <option *ngFor="let periode of periodes" [value]="periode.value">
+                  📅 {{ periode.label }}
+                </option>
+              </select>
+              <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+          </div>
+
+          <!-- Numéro d'évaluation -->
+          <div class="form-group" *ngIf="bulkForm.get('type')?.value === 'devoir'">
+            <label class="form-label">
+              <i class="fas fa-hashtag"></i>
+              Numéro *
+            </label>
+            <div class="select-wrapper">
+              <select
+                formControlName="numero"
+                class="form-select"
+                [class.error]="f['numero'].touched && f['numero'].invalid">
+                <option value="" disabled selected>🔢 Sélectionner un numéro</option>
+                <option *ngFor="let num of numerosDisponibles"
+                        [value]="num.numero"
+                        [disabled]="!num.estDisponible"
+                        [class.text-success]="num.estDisponible"
+                        [class.text-danger]="!num.estDisponible">
+                  Devoir n°{{ num.numero }}
+                  <span *ngIf="num.existeDeja"> (Déjà attribué)</span>
+                  <span *ngIf="!num.estDisponible && !num.existeDeja"> (Indisponible)</span>
+                </option>
+              </select>
+              <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+            <div class="form-hint" *ngIf="numerosCharges">
+              <i class="fas fa-info-circle"></i>
+              Sélectionnez un numéro disponible
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <!-- Section Notes -->
+      <div class="card-section" *ngIf="eleves.length > 0">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fas fa-user-graduate"></i>
+            <h3>Notes des élèves</h3>
+            <span class="student-count">{{ eleves.length }} élèves</span>
+          </div>
+
+          <div class="section-actions">
+            <button type="button" class="btn-action" (click)="setSameNoteForAll()">
+              <i class="fas fa-equals"></i>
+              Note identique
+            </button>
+            <button type="button" class="btn-action btn-clear" (click)="clearAllNotes()">
+              <i class="fas fa-eraser"></i>
+              Tout effacer
+            </button>
+          </div>
+        </div>
+
+        <!-- Table des élèves -->
+        <div class="table-container">
+          <div class="table-scroll">
+            <table class="students-table">
+              <thead>
+                <tr>
+                  <th width="40%">ÉLÈVE</th>
+                  <th width="15%">MATRICULE</th>
+                  <th width="25%">NOTE /20</th>
+                  <th width="20%">APPRÉCIATION</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let eleve of eleves; let i = index"
+                    [class.even-row]="i % 2 === 0">
+                  <td>
+                    <div class="student-info">
+                      <div class="student-avatar">
+                        <i class="fas fa-user-circle"></i>
+                      </div>
+                      <div class="student-details">
+                        <div class="student-name">{{ eleve.nom_complet }}</div>
+                        <div class="student-class">{{ selectedClasse?.nom }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="matricule">{{ eleve.matricule }}</span>
+                  </td>
+                  <td>
+                    <div class="note-input-container">
+                      <input
+                        type="number"
+                        [formControlName]="'note_' + eleve.id"
+                        class="note-input"
+                        placeholder="0.00"
+                        min="0"
+                        max="20"
+                        step="0.25"
+                        [class.input-error]="bulkForm.get('note_' + eleve.id)?.touched &&
+                                            bulkForm.get('note_' + eleve.id)?.invalid">
+                      <span class="note-max">/20</span>
+                    </div>
+                    <div class="input-error-message"
+                         *ngIf="bulkForm.get('note_' + eleve.id)?.touched &&
+                                bulkForm.get('note_' + eleve.id)?.invalid">
+                      Note invalide
+                    </div>
+                  </td>
+                  <td>
+                    <div *ngIf="bulkForm.get('note_' + eleve.id)?.value"
+                         class="appreciation-container">
+                      <div class="note-value">
+                        {{ bulkForm.get('note_' + eleve.id)?.value | number:'1.2-2' }}
+                      </div>
+                      <div class="appreciation-badge"
+                           [class]="getNoteColor(bulkForm.get('note_' + eleve.id)?.value)">
+                        {{ getAppreciation(bulkForm.get('note_' + eleve.id)?.value) }}
+                      </div>
+                    </div>
+                    <div *ngIf="!bulkForm.get('note_' + eleve.id)?.value" class="no-note">
+                      <span class="empty-state">Non noté</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions de soumission -->
+      <div class="card-section actions-section">
+        <div class="actions-content">
+          <div class="validation-summary">
+            <div class="summary-item" *ngIf="eleves.length > 0">
+              <i class="fas"
+                 [class.fa-check-circle]="getNombreNotesValides() === eleves.length"
+                 [class.fa-exclamation-circle]="getNombreNotesValides() < eleves.length"></i>
+              {{ getNombreNotesValides() }}/{{ eleves.length }} notes valides
+            </div>
+            <div class="summary-item" *ngIf="stats.moyenne > 0">
+              <i class="fas fa-chart-bar"></i>
+              Moyenne : {{ stats.moyenne.toFixed(2) }}/20
+            </div>
+          </div>
+
+          <div class="submit-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="debugForm()">
+              <i class="fas fa-bug"></i>
+              Debug
+            </button>
+
+            <button
+              type="submit"
+              [disabled]="isSubmitting || !bulkForm.valid || getNombreNotesValides() === 0"
+              class="btn btn-primary submit-btn"
+              [class.loading]="isSubmitting">
+              <span *ngIf="!isSubmitting">
+                <i class="fas"
+                   [class.fa-save]="mode === 'modification_masse'"
+                   [class.fa-paper-plane]="mode === 'attribution'"></i>
+                {{ mode === 'modification_masse' ? 'Mettre à jour' : 'Attribuer les notes' }}
+                ({{ getNombreNotesValides() }})
+              </span>
+              <span *ngIf="isSubmitting">
+                <i class="fas fa-spinner fa-spin"></i>
+                {{ mode === 'modification_masse' ? 'Mise à jour...' : 'Attribution...' }}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </form> <!-- Fermeture du formulaire -->
+  </div>
+</div>

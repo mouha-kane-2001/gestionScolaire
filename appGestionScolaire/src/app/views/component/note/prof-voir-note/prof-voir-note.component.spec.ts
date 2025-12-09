@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MessageListComponent } from './message-list.component';
+import { ProfVoirNoteComponent } from './prof-voir-note.component';
 
-describe('MessageListComponent', () => {
-  let component: MessageListComponent;
-  let fixture: ComponentFixture<MessageListComponent>;
+describe('ProfVoirNoteComponent', () => {
+  let component: ProfVoirNoteComponent;
+  let fixture: ComponentFixture<ProfVoirNoteComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MessageListComponent]
+      imports: [ProfVoirNoteComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(MessageListComponent);
+    fixture = TestBed.createComponent(ProfVoirNoteComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

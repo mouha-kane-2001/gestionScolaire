@@ -36,6 +36,42 @@ interface AffectationPayload {
   standalone: true
 })
 export class ProfClasseComponent implements OnInit, OnDestroy {
+
+
+
+  // PROPRIÉTÉS POUR LES ALERTES
+  showAlert = false;
+  alertType: 'success' | 'danger' | 'warning' | 'info' = 'success';
+  alertMessage = '';
+  alertTimeout: any = null;
+
+    // MÉTHODES POUR LES ALERTES
+  showAlertMessage(message: string, type: 'success' | 'danger' | 'warning' | 'info' = 'info', duration: number = 5000) {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlert = true;
+
+    // Annuler l'alerte précédente si elle existe
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+    }
+
+    // Auto-fermeture après la durée spécifiée
+    this.alertTimeout = setTimeout(() => {
+      this.closeAlert();
+    }, duration);
+  }
+
+  closeAlert() {
+    this.showAlert = false;
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+      this.alertTimeout = null;
+    }
+  }
+
+
+
   assignForm: FormGroup;
   professeurs: Professeur[] = [];
   classes: Classe[] = [];
@@ -92,7 +128,7 @@ export class ProfClasseComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Erreur lors du chargement des professeurs:', error);
-            this.showError('Impossible de charger la liste des professeurs');
+            this.showAlertMessage('Impossible de charger la liste des professeurs','danger');
             resolve();
           }
         });
@@ -110,7 +146,7 @@ export class ProfClasseComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Erreur lors du chargement des classes:', error);
-            this.showError('Impossible de charger la liste des classes');
+            this.showAlertMessage('Impossible de charger la liste des classes',error);
             resolve();
           }
         });
@@ -136,14 +172,14 @@ export class ProfClasseComponent implements OnInit, OnDestroy {
 
   private handleSuccess(): void {
     this.isSubmitting = false;
-    this.showSuccess('Professeur affecté avec succès !');
+    this.showAlertMessage('Professeur affecté avec succès !','success');
     this.resetForm();
   }
 
   private handleError(error: any): void {
     this.isSubmitting = false;
     console.error('Erreur lors de l\'affectation:', error);
-    this.showError('Erreur lors de l\'affectation du professeur');
+    this.showAlertMessage('Erreur lors de l\'affectation du professeur','danger');
   }
 
   private resetForm(): void {
@@ -160,15 +196,8 @@ export class ProfClasseComponent implements OnInit, OnDestroy {
     });
   }
 
-  private showSuccess(message: string): void {
-    // Remplacer par un service de notification ou toast
-    alert(message);
-  }
 
-  private showError(message: string): void {
-    // Remplacer par un service de notification ou toast
-    alert(message);
-  }
+
 
   // Getters pour le template
   get professeurId() {
@@ -191,4 +220,9 @@ removeClass(classId: number): void {
   this.classesIds?.setValue(updatedClasses);
   this.classesIds?.markAsTouched();
 }
+
+
+
+
+
 }

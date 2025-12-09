@@ -1,16 +1,53 @@
 <div class="dashboard-parent">
   <!-- En-tête -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0">Tableau de Bord Parent</h1>
-    <div class="d-flex gap-2">
-      <button cButton color="primary" routerLink="/parent/messages">
-        <i class="cil-envelope-open"></i> Messages
-      </button>
-      <button cButton color="success" routerLink="/parent/notes">
-        <i class="cil-notes"></i> Notes
-      </button>
+  <!-- En-tête amélioré -->
+<div class="dashboard-header card shadow-sm mb-4">
+  <div class="card-body p-4">
+    <div class="row align-items-center">
+      <!-- Section texte -->
+      <div class="col-md-8">
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <div class="avatar-admin bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+              <i class="cil-user text-white" style="font-size: 1.5rem;"></i>
+            </div>
+          </div>
+          <div>
+            <h1 class="h2 mb-1 text-primary">Tableau de Bord Parent</h1>
+            <div class="d-flex align-items-center">
+              <span class="text-muted me-2">
+                <i class="cil-user me-1"></i>
+                {{ userPrenom }} {{ userNom }}
+              </span>
+              <span class="badge bg-primary bg-gradient">
+                <i class="cil-people me-1"></i>
+                Parent
+              </span>
+              <span *ngIf="eleves.length > 0" class="badge bg-info ms-2">
+                <i class="cil-child me-1"></i>
+                {{ eleves.length }} enfant{{ eleves.length > 1 ? 's' : '' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section boutons -->
+      <div class="col-md-4">
+        <div class="d-flex justify-content-end gap-3">
+          <button cButton color="outline-primary" class="shadow-sm" routerLink="/absences">
+            <i class="cil-calendar me-2"></i>
+            Absences
+          </button>
+          <button cButton color="outline-success" class="shadow-sm" routerLink="/convocations">
+            <i class="cil-envelope-open me-2"></i>
+            Convocations
+          </button>
+        </div>
+      </div>
     </div>
   </div>
+</div>
 
   <!-- Cartes de statistiques -->
   <c-row class="mb-4">

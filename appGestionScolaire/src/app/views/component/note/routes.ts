@@ -22,5 +22,20 @@ export const routes: Routes = [
     loadComponent: () => import('./enfant-consultenotes/enfant-consultenotes.component').then(m => m. EnfantConsultenotesComponent),
     data: { title: '' }
   },
+  {
+    path: 'saisiMasse',
+    loadComponent: () => import('./bulk-notes/bulk-notes.component').then(m => m.BulkNotesComponent),
+    data: { title: 'saisi note en masse' }
+  },
+   {
+    path: 'voirNotes',
+    loadComponent: () => import('./prof-voir-note/prof-voir-note.component').then(m => m.ProfVoirNoteComponent),
+    data: { title: 'saisi note en masse' }
+  },
+  {
+  path: 'bulk-edit',
+  loadComponent: () => import('./bulk-notes/bulk-notes.component').then(m => m.BulkNotesComponent),
+  data: { title: 'Modifier notes en masse' }
+},
 
 ];

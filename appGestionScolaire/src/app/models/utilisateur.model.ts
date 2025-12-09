@@ -9,4 +9,8 @@ export interface Utilisateur {
   classe_id?: number | null;   // pour élève
    elevesIds: number[];        // pour parent
    matiere_id :number | null;    // pour professeur,
+   created_at?: string;
+  updated_at?: string;
+
+
 }

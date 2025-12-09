@@ -1,14 +1,49 @@
 <div class="dashboard-admin">
-  <!-- En-tête -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0">Tableau de Bord Administrateur</h1>
-    <div class="d-flex gap-2">
-             <button cButton color="success" routerLink="/users">
-        <i class="bi bi-people-fill"></i> Gérer Utilisateurs
-      </button>
+<!-- En-tête -->
+ <!-- En-tête amélioré -->
+<div class="dashboard-header card shadow-sm mb-4">
+  <div class="card-body p-4">
+    <div class="row align-items-center">
+      <!-- Section texte -->
+      <div class="col-md-8">
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <div class="avatar-admin bg-body-secondary bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+              <i class="cil-settings text-white" style="font-size: 1.5rem;"></i>
+            </div>
+          </div>
+          <div>
+            <h1 class="h2 mb-1 text-black">Tableau de Bord Admin</h1>
+            <div class="d-flex align-items-center">
+              <span class="text-muted me-2">
+                <i class="cil-user me-1"></i>
+                {{ userPrenom }} {{ userNom }}
+              </span>
+              <span class="badge text-bg-success">
+                <i class="cil-shield-alt me-1"></i>
+                {{ userRole | titlecase }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <!-- Section boutons -->
+      <div class="col-md-4">
+        <div class="d-flex justify-content-end gap-3">
+          <button cButton color="success" class="shadow-sm" routerLink="/users">
+            <i class="bi bi-people-fill me-2"></i>
+            Gérer Utilisateurs
+          </button>
+          <button cButton color="outline-primary" class="shadow-sm" routerLink="/parametres">
+            <i class="cil-cog me-2"></i>
+            Paramètres
+          </button>
+        </div>
+      </div>
     </div>
   </div>
+</div>
 
   <!-- Cartes de statistiques globales -->
   <c-row class="mb-4">
@@ -172,18 +207,7 @@
 
       <!-- Statistiques détaillées -->
       <c-row>
-        <c-col lg="6">
-          <c-card class="mb-4">
-            <c-card-header>
-              <h6 class="card-title mb-0">Performances par classe</h6>
-            </c-card-header>
-            <c-card-body>
-              <div style="height: 250px;">
-                <c-chart type="bar" [data]="chartData.performance" [options]="chartOptions.performance"></c-chart>
-              </div>
-            </c-card-body>
-          </c-card>
-        </c-col>
+
         <c-col lg="6">
           <c-card class="mb-4">
             <c-card-header>
