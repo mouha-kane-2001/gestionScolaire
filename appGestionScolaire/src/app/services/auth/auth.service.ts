@@ -1,17 +1,48 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-
   private baseUrl = `${environment.apiUrl}/Auth`;
   private tokenKey = 'token';
 
-  constructor(private http: HttpClient ) {}
+  constructor(private http: HttpClient) {}
+
+  // CORRECTION CRITIQUE : Ajoutez le type de retour et la gestion d'erreurs
+  login(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/login`, data).pipe(
+      tap((response: any) => {
+        console.log('Réponse API:', response); // Debug
+        this.saveToken(response.token);
+        this.saveUserInfo(response.user, response.specific_id);
+      }),
+      catchError(this.handleError) // Ajoutez la gestion d'erreurs
+    );
+  }
+
+  // Méthode pour gérer les erreurs HTTP
+  private handleError(error: HttpErrorResponse) {
+    console.error('Erreur HTTP:', error);
+
+    let errorMessage = 'Une erreur est survenue';
+    if (error.status === 0) {
+      // Client-side or network error
+      errorMessage = 'Erreur réseau ou CORS. Vérifiez que le serveur est accessible.';
+    } else if (error.status === 401) {
+      errorMessage = 'Email ou mot de passe incorrect';
+    } else if (error.status === 404) {
+      errorMessage = 'API non trouvée';
+    } else {
+      // Backend error
+      errorMessage = error.error?.message || `Erreur ${error.status}: ${error.statusText}`;
+    }
+
+    return throwError(() => new Error(errorMessage));
+  }
 
 
 
@@ -56,15 +87,6 @@ export class AuthService {
 
 
 
-  // auth.service.ts
-login(data: any): Observable<any> {
-  return this.http.post(`${this.baseUrl}/login`, data).pipe(
-    tap((response: any) => {
-      this.saveToken(response.token);
-      this.saveUserInfo(response.user, response.specific_id);
-    })
-  );
-}
 
 // auth.service.ts
 saveUserInfo(user: any, specificId: number | null) {

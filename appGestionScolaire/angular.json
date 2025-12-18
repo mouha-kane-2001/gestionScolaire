@@ -50,7 +50,10 @@
               "sass": {
                 "silenceDeprecations": []
               }
-            }
+            },
+
+            "baseHref": "/",
+            "deployUrl": "/"
           },
           "configurations": {
             "production": {

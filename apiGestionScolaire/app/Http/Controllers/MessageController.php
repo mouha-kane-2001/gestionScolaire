@@ -47,8 +47,8 @@ class MessageController extends Controller
     public function getSentMessages($id)
 {
     $messages = Message::where('expediteur_id', $id)
-        ->selectRaw('MIN(id) as id, groupe_id, objet, contenu, type, priorite, categorie, classe_id,destinataire_id,role_destinataire,created_at')
-        ->groupBy('groupe_id', 'objet', 'contenu', 'type', 'priorite', 'categorie', 'classe_id','destinataire_id','role_destinataire','created_at')
+        ->selectRaw('MIN(id) as id, groupe_id, objet, contenu, type, priorite, categorie, classe_id, role_destinataire, created_at')
+        ->groupBy('groupe_id', 'objet', 'contenu', 'type', 'priorite', 'categorie', 'classe_id', 'role_destinataire', 'created_at')
         ->orderByDesc('created_at')
         ->get();
 

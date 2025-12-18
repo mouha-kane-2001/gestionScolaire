@@ -14,8 +14,8 @@ import { authGuard } from './guards/auth.guard';
   {
     path: '',
      component: AdminLayoutComponent,
-  canActivate: [authGuard],
-data: { role: 'ADMIN' },
+//  canActivate: [authGuard],
+//data: { role: 'ADMIN' },
 
     children: [
       {

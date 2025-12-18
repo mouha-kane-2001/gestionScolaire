@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 // AJOUTEZ CECI :
 interface NumeroEvaluation {
   numero: number;
@@ -22,7 +23,7 @@ export interface NoteData {
 })
 export class NotesService {
 
-  private apiUrl = 'http://localhost:8000/api/notes';
+  private apiUrl =   `${environment.apiUrl}/notes`;
 
   constructor(private http: HttpClient) {}
 getAllNotes(): Observable<any> {

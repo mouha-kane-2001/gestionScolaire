@@ -13,7 +13,12 @@ export const navItems: INavData[] = [
   },
   {
     name: 'Saisir Note',
-    url: '/prof/notes/attribue',
+    url: '/prof/notes/saisiMasse',
+    iconComponent: { name: 'cil-pencil' }
+  },
+   {
+    name: 'Voir  Note',
+    url: '/prof/notes/voirNotes',
     iconComponent: { name: 'cil-pencil' }
   },
   {

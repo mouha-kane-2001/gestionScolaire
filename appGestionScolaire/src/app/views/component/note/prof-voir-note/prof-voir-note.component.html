@@ -24,13 +24,19 @@
                 <option *ngFor="let classe of classes" [value]="classe.id">{{ classe.nom }}</option>
               </select>
             </div>
-            <div class="col-md">
-              <label class="form-label fw-semibold small mb-1">Matière</label>
-              <select [(ngModel)]="selectedMatiereId" (change)="onFiltresChange()" class="form-select form-select-sm">
-                <option value="">Choisir matière</option>
-                <option *ngFor="let matiere of matieres" [value]="matiere.id">{{ matiere.nom }}</option>
-              </select>
-            </div>
+            <!-- Section matière (remplacée) -->
+<div class="col-md">
+  <label class="form-label fw-semibold small mb-1">Matière</label>
+  <div class="form-control bg-light py-2" *ngIf="profMatiere">
+    <div class="d-flex align-items-center">
+      <span class="fw-bold">{{ profMatiere.nom }}</span>
+      <span class="badge bg-primary ms-2">Votre matière</span>
+    </div>
+  </div>
+  <div class="form-control bg-light py-2 text-muted" *ngIf="!profMatiere">
+    <i class="fas fa-spinner fa-spin me-2"></i> Chargement de votre matière...
+  </div>
+</div>
             <div class="col-md">
               <label class="form-label fw-semibold small mb-1">Type</label>
               <select [(ngModel)]="selectedType" (change)="onFiltresChange()" class="form-select form-select-sm">

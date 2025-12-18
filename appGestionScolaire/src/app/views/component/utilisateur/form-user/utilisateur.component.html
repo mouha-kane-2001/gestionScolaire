@@ -154,13 +154,16 @@
                 <label for="classe" class="form-label small fw-semibold">Classe</label>
                 <select class="form-select form-select-sm"
                         [(ngModel)]="utilisateur.classe_id"
-                        name="classe_id">
+                        name="classe_id"  #classeInput="ngModel"   [required]="utilisateur.role === 'eleve'">
                   <option value="">Sélectionnez une classe</option>
                   <option *ngFor="let classe of classes" [value]="classe.id">
                     {{ classe.nom }}
                   </option>
                 </select>
               </div>
+               <div *ngIf="classeInput.invalid && classeInput.touched" class="text-danger small mt-1">
+      <i class="bi bi-exclamation-circle"></i> Classe obligatoire pour un élève
+    </div>
             </div>
 
             <!-- POUR PROFESSEUR -->
@@ -169,12 +172,16 @@
                 <label for="matiere" class="form-label small fw-semibold">Matière</label>
                 <select class="form-select form-select-sm"
                         [(ngModel)]="utilisateur.matiere_id"
-                        name="matiere_id">
+                        name="matiere_id"      #matiereInput="ngModel"
+        [required]="utilisateur.role === 'prof'">
                   <option value="">Sélectionnez une matière</option>
                   <option *ngFor="let matiere of matieres" [value]="matiere.id">
                     {{ matiere.nom }}
                   </option>
                 </select>
+                <div *ngIf="matiereInput.invalid && matiereInput.touched" class="text-danger small mt-1">
+  <i class="bi bi-exclamation-circle"></i> Matière obligatoire pour un professeur
+</div>
               </div>
             </div>
 
@@ -236,3 +243,4 @@
     </div>
   </div>
 </div>
+ 

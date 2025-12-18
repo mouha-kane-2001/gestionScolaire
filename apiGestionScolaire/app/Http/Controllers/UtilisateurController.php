@@ -140,9 +140,14 @@ $updated = Eleve::whereIn('id', $elevesIds)->update(['parent_id' => $parent->id]
 }
 }
 
+    
     public function show($id)
     {
-        $utilisateur = User::find($id);
+        $utilisateur = User::with([
+        'eleve.classe',       // pour les élèves
+        'professeur', // pour les profs
+        'parentEleve.eleves'       // pour les parents
+    ])->find($id);
         if (!$utilisateur) {
             return response()->json(['message' => 'Utilisateur non trouvé'], 404);
         }

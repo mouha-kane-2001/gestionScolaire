@@ -15,6 +15,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\EnvoyerNotificationJob;
 use App\Models\Admin;
+use Illuminate\Support\Str;
 
 class EnvoyerMessageJob implements ShouldQueue
 {
@@ -25,6 +26,7 @@ class EnvoyerMessageJob implements ShouldQueue
     public function __construct(array $data)
     {
         $this->data = $data;
+            $this->data['groupe_id'] = (string) Str::uuid();
         Log::info('EnvoyerMessageJob __construct', $data);
     }
 
@@ -104,6 +106,15 @@ foreach ($recipients as $recipient) {
 
     private function createMessage($destinataireId): Message
     {
+
+          Log::info('createMessage - Données avant création', [
+        'destinataire_id' => $destinataireId,
+        'has_groupe_id_in_data' => isset($this->data['groupe_id']),
+        'groupe_id_value' => $this->data['groupe_id'] ?? 'NULL',
+        'all_data' => $this->data // Optionnel: montre tout
+    ]);
+
+
         $message = Message::create([
             'expediteur_id' => $this->data['expediteur_id'],
             'destinataire_id' => $destinataireId,
@@ -115,11 +126,16 @@ foreach ($recipients as $recipient) {
             'priorite' => $this->data['priorite'] ?? 'normal',
             'categorie' => $this->data['categorie'] ?? null,
             'classe_id' => $this->data['classe_id'] ?? null,
+            'groupe_id' => $this->data['groupe_id'] ?? null, // ← AJOUTEZ CETTE LIGNE
         ]);
             $message->refresh();
 
-
-        Log::info('createMessage', ['destinataire_id' => $destinataireId, 'element_lie_id' => $message->id]);
+            Log::info('createMessage', [
+        'destinataire_id' => $destinataireId,
+        'element_lie_id' => $message->id,
+        'groupe_id' => $message->groupe_id, // ← AJOUTE ÇA
+        'groupe_id_from_data' => $this->data['groupe_id'] ?? 'NULL' // ← ET ÇA
+    ]);
         return $message;
     }
 
@@ -149,3 +165,4 @@ foreach ($recipients as $recipient) {
         }
     }
 }
+

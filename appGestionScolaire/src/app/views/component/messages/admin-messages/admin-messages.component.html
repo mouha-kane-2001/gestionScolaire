@@ -33,7 +33,7 @@
                   (click)="currentSection = 'recus'">
             <i class="fas fa-inbox"></i>
             <span class="nav-label">Reçus</span>
-            <span *ngIf="unreadCount > 0" class="notification-badge mini" style="color: black;">
+            <span *ngIf="unreadCount > 0" class="notification-badge mini text-danger" style="color: black;">
               {{ unreadCount }}
             </span>
           </button>
@@ -180,8 +180,8 @@
         <!-- En-tête avec filtres -->
         <div class="messages-header compact">
           <div class="messages-stats">
-            <span class="stat">{{ messagesRecus.length }} messages</span>
-            <span  *ngIf="unreadCount > 0" class="stat unread" style="color: black;">{{ unreadCount }} non lus</span>
+            <span class="stat text-danger">{{ messagesRecus.length }} messages</span>
+            <span  *ngIf="unreadCount > 0" class="stat unread text-danger" style="color: black;">{{ unreadCount }} non lus</span>
           </div>
 
           <div class="messages-filters">

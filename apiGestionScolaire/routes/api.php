@@ -12,8 +12,32 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ParentController;
 use App\Http\Controllers\ProfController;
 use App\Http\Controllers\UtilisateurController;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
+// Route de test ULTRA simple
+Route::post('/test-simple-login', function(Request $request) {
+    Log::info('Test route called', $request->all());
+    return response()->json([
+        'success' => true,
+        'message' => 'Simple test works',
+        'data' => $request->all()
+    ]);
+});
+
+
+
+
+ // Routes Auth SANS préfixe
+// Routes OPTIONS pour toutes les routes Auth
+Route::options('/Auth/{any}', function() {
+    return response('', 200);
+})->where('any', '.*');
+
+// Puis tes routes normales
+Route::post('/Auth/login', [AuthController::class, 'login']);
+Route::post('/Auth/logout', [AuthController::class, 'logout']);
 
 Route::get('/matieres', [MatiereController::class, 'index']);
 Route::get('/classes', [ClasseController::class, 'index']);
@@ -56,17 +80,6 @@ Route::get('/notes/parent/{parentId}', [NoteController::class, 'notesParent']);
 
 Route::get('/utilisateurs/parent/{parentId}/enfants', [ParentController::class, 'enfants']);
 
-
-
-Route::group([
-    'prefix' => 'Auth'
-], function () {
-    Route::post('login', [AuthController::class, 'login']);
-    Route::post('register', [AuthController::class, 'register']);
-    Route::post('logout', [AuthController::class, 'logout']);
-    Route::post('refresh', [AuthController::class, 'refresh']);
-    Route::get('profile', [AuthController::class, 'profile'])->middleware('auth:api');
-});
 
 
 Route::prefix('absences')->group(function () {

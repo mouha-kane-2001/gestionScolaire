@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class Message extends Model
@@ -36,5 +36,14 @@ class Message extends Model
     public function classe()
     {
         return $this->belongsTo(Classe::class, 'classe_id');
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($message) {
+            if (empty($message->groupe_id)) {
+                $message->groupe_id = (string) Str::uuid();
+            }
+        });
     }
 }

@@ -136,13 +136,14 @@ classes: Classe[] = [];     // Liste des classes depuis l'API
     this.mode = 'modif';
     this.userService.getUserById(+id).subscribe({
       next: (data: any) => {
+        console.log('Données utilisateur reçues pour modification :', data);
         // Pour les champs spécifiques
         this.utilisateur = {
           ...data,
           motDePasseHash: '',
-          classeId: data.classeId || null,
-          matiere_id: data.matiere_id || null,
-          elevesIds: data.elevesIds || []
+          classe_id: data.role === 'eleve' ? data.eleve?.classe_id ?? null : null,
+      matiere_id: data.role === 'prof' ? data.professeur?.matiere_id ?? null : null,
+        elevesIds: data.role === 'parent' ? data.parent_eleve?.eleves?.map((e:any)=>e.id) ?? [] : [],
         };
         this.originalEmail = data.email; // ← important !
       },
@@ -369,3 +370,4 @@ addEleve(eleve: any) {
 }
 
 }
+ 

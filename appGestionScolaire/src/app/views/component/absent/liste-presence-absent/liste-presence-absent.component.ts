@@ -72,7 +72,7 @@ export class ListePresenceAbsentComponent implements OnInit {
 
 
 
-  
+
   allEleves: Eleve[] = [];
   elevesFiltres: Eleve[] = [];
   classes: Classe[] = [];
@@ -113,32 +113,45 @@ export class ListePresenceAbsentComponent implements OnInit {
     this.chargerDonneesInitiales();
   }
 
-  chargerDonneesInitiales() {
-    const specificId = this.authService.getSpecificId();
+chargerDonneesInitiales() {
+  const specificId = this.authService.getSpecificId();
 
-    if (!specificId) {
-      console.error('specific_id non trouvé dans le token');
-      return;
-    }
-
-    this.referenceService.getClassesDuProfesseur(specificId).subscribe({
-      next: (res: any) => {
-        this.classes = res.classes || [];
-      },
-      error: (err: any) => console.error('Erreur chargement classes', err)
-    });
-
-    this.userService.getElevesAvecMatricule().subscribe({
-      next: (eleves: Eleve[]) => {
-        this.allEleves = eleves;
-        this.elevesFiltres = [];
-        // Charger les absences existantes pour aujourd'hui
-        this.chargerAbsencesExistantes();
-      },
-      error: (err: any) => console.error('Erreur chargement élèves', err)
-    });
+  if (!specificId) {
+    console.error('specific_id non trouvé dans le token');
+    return;
   }
 
+  // CORRECTION : Supprimez le deuxième appel duplicate et gardez seulement celui-ci
+  this.referenceService.getClassesDuProfesseur(specificId).subscribe({
+    next: (res: any) => {
+      console.log('Réponse API getClassesDuProfesseur :', res);
+      this.classes = res.classes || [];
+
+      // VÉRIFIEZ LA STRUCTURE DE LA RÉPONSE
+      console.log('Structure complète de la réponse:', JSON.stringify(res, null, 2));
+
+      // Correction pour s'adapter à différentes structures de réponse
+      if (res.matiere && res.matiere.id) {
+        this.matiereId = res.matiere.id;
+      } else if (res.matiere_id) {
+        this.matiereId = res.matiere_id;
+      } else if (res.id_matiere) {
+        this.matiereId = res.id_matiere;
+      }
+      console.log('Matière ID définie:', this.matiereId);
+
+      this.userService.getElevesAvecMatricule().subscribe({
+        next: (eleves: Eleve[]) => {
+          this.allEleves = eleves;
+          this.elevesFiltres = [];
+          this.chargerAbsencesExistantes();
+        },
+        error: (err: any) => console.error('Erreur chargement élèves', err)
+      });
+    },
+    error: (err: any) => console.error('Erreur chargement classes', err)
+  });
+}
   // NOUVEAU : Charger les absences déjà enregistrées en base
   chargerAbsencesExistantes() {
     const specificId = this.authService.getSpecificId();
@@ -378,3 +391,4 @@ export class ListePresenceAbsentComponent implements OnInit {
     console.log('Sauvegarde des présences...');
   }
 }
+ 

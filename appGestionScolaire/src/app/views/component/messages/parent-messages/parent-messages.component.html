@@ -35,8 +35,8 @@
             <i class="bi bi-bell"></i>
           </div>
           <div class="stat-content">
-            <span class="stat-number">{{ unreadCount }}</span>
-            <span class="stat-label">Non lus</span>
+            <span class="stat-number text-danger">{{ unreadCount }}</span>
+            <span class="stat-label text-danger" >Non lus</span>
           </div>
         </div>
         <button class="btn-refresh" (click)="refreshMessages()" title="Actualiser">
@@ -63,7 +63,7 @@
               (click)="currentSection = 'recus'">
         <div class="tab-icon">
           <i class="bi bi-inbox"></i>
-          <span *ngIf="unreadCount > 0" class="tab-badge">{{ unreadCount }}</span>
+          <span *ngIf="unreadCount > 0" class="tab-badge text-danger" >{{ unreadCount }}</span>
         </div>
         <span>Boîte de réception</span>
       </button>
@@ -270,7 +270,7 @@
             <h2 class="section-title">Boîte de réception</h2>
             <div class="messages-stats">
               <span class="stat-text">{{ filteredMessages.length }} message(s)</span>
-              <span *ngIf="unreadCount > 0" class="unread-stat">{{ unreadCount }} non lu(s)</span>
+              <span *ngIf="unreadCount > 0" class="unread-stat text-danger">{{ unreadCount }} non lu(s)</span>
             </div>
           </div>
         </div>

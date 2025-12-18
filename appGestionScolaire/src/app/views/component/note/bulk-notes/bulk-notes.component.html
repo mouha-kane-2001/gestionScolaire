@@ -46,21 +46,17 @@
           </div>
 
           <!-- Matière -->
-          <div class="form-group">
-            <label class="form-label">
-              <i class="fas fa-book"></i>
-              Matière *
-            </label>
-            <div class="select-wrapper">
-              <select formControlName="matiere_id" class="form-select">
-                <option value="" disabled selected>Sélectionner une matière...</option>
-                <option *ngFor="let matiere of matieres" [value]="matiere.id">
-                  📚 {{ matiere.nom }}
-                </option>
-              </select>
-              <i class="fas fa-chevron-down select-arrow"></i>
-            </div>
-          </div>
+         <!-- Au lieu d'un select pour les matières, affichez directement la matière du prof -->
+<div class="mb-3">
+  <label class="form-label">Matière</label>
+  <div class="form-control bg-light">
+    <strong>{{ profMatiere?.nom || 'Matière non définie' }}</strong>
+    <input type="hidden" formControlName="matiere_id" [value]="profMatiere?.id">
+  </div>
+  <small class="text-muted">
+    Vous êtes professeur de cette matière
+  </small>
+</div>
 
           <!-- Type d'évaluation -->
           <div class="form-group">

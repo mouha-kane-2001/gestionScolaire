@@ -111,6 +111,8 @@ export class BulkNotesComponent implements OnInit {
       }
     });
 
+
+
     this.bulkForm.get('matiere_id')?.valueChanges.subscribe(() => this.chargerNumerosDisponibles());
     this.bulkForm.get('type')?.valueChanges.subscribe(() => this.chargerNumerosDisponibles());
     this.bulkForm.get('periode')?.valueChanges.subscribe(() => this.chargerNumerosDisponibles());
@@ -129,7 +131,21 @@ export class BulkNotesComponent implements OnInit {
 
 
 
+getMatiereProf() {
+  const specificId = this.authService.getSpecificId();
+  if (!specificId) return;
 
+  this.userService.getProfesseurs().subscribe({
+    next: (res: any) => {
+      const professeur = res.find((p: any) => p.id === specificId);
+      if (professeur?.matiere) {
+        this.profMatiere = professeur.matiere;
+        this.bulkForm.patchValue({ matiere_id: this.profMatiere?.id });
+      }
+    },
+    error: (err: any) => console.error("Erreur récupération professeur:", err)
+  });
+}
 
 
   // Modifiez la méthode recupererDonneesNavigation
@@ -446,21 +462,6 @@ updateNumeroValidation(type: string) {
     this.getMatiereProf();
   }
 
-  getMatiereProf() {
-    const specificId = this.authService.getSpecificId();
-    if (!specificId) return;
-
-    this.userService.getProfesseurs().subscribe({
-      next: (res: any) => {
-        const professeur = res.find((p: any) => p.id === specificId);
-        if (professeur?.matiere) {
-          this.profMatiere = professeur.matiere;
-          this.bulkForm.patchValue({ matiere_id: this.profMatiere?.id });
-        }
-      },
-      error: (err: any) => console.error("Erreur récupération professeur:", err)
-    });
-  }
 
  chargerNumerosDisponibles() {
   const classeId = this.bulkForm.get('classe_id')?.value;

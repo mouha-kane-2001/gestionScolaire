@@ -22,7 +22,7 @@
 
       <div class="header-stats">
         <div class="stat-item">
-          <span class="stat-number">{{ unreadCount }}</span>
+          <span class="stat-number text-danger">{{ unreadCount }}</span>
           <span class="stat-label">Non lus</span>
         </div>
         <button class="btn-refresh" (click)="refreshMessages()" title="Actualiser">
@@ -47,7 +47,7 @@
               (click)="currentSection = 'recus'">
         <i class="bi bi-inbox"></i>
         <span>Boîte de réception</span>
-        <span *ngIf="unreadCount > 0" class="tab-badge">{{ unreadCount }}</span>
+        <span *ngIf="unreadCount > 0" class="  text-danger">{{ unreadCount }}</span>
       </button>
 
       <button class="tab-item"
@@ -246,8 +246,8 @@
           <span class="stat-number">{{ messagesRecus.length }}</span>
           <span class="stat-label">Total</span>
         </div>
-        <div *ngIf="unreadCount > 0" class="stat-badge unread">
-          <span class="stat-number">{{ unreadCount }}</span>
+        <div *ngIf="unreadCount > 0" class="stat-badge   text-danger">
+          <span class="stat-number text-danger">{{ unreadCount }}</span>
           <span class="stat-label">Non lus</span>
         </div>
       </div>

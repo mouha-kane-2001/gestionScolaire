@@ -12,9 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         channels: __DIR__.'/../routes/channels.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        //
-    })
-    ->withExceptions(function (Exceptions $exceptions): void {
+   ->withMiddleware(function (Middleware $middleware) {
+    $middleware->api(prepend: [
+        \App\Http\Middleware\Cors::class,  // Notre middleware custom
+    ]);
+})
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

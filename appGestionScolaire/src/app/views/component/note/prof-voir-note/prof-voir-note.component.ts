@@ -96,24 +96,29 @@ export class ProfVoirNoteComponent implements OnInit {
     }
   }
 
-  chargerMatiereProf() {
-    const specificId = this.authService.getSpecificId();
-    if (!specificId) return;
+ chargerMatiereProf() {
+  const specificId = this.authService.getSpecificId();
+  if (!specificId) return;
 
-    this.userService.getProfesseurs().subscribe({
-      next: (res: any) => {
-        const professeur = res.find((p: any) => p.id === specificId);
-        if (professeur?.matiere) {
-          this.profMatiere = professeur.matiere;
-          this.selectedMatiereId = this.profMatiere?.id;
-          // Ajouter la matière du prof dans le tableau matieres pour l'affichage
-          this.matieres = [this.profMatiere!];
-          console.log('Matière du prof chargée:', this.profMatiere);
+  this.userService.getProfesseurs().subscribe({
+    next: (res: any) => {
+      const professeur = res.find((p: any) => p.id === specificId);
+      if (professeur?.matiere) {
+        this.profMatiere = professeur.matiere;
+        this.selectedMatiereId = this.profMatiere?.id;
+        // Ajouter la matière du prof dans le tableau matieres pour l'affichage
+        this.matieres = [this.profMatiere!];
+        console.log('Matière du prof chargée:', this.profMatiere);
+
+        // Charger automatiquement les notes si une classe est déjà sélectionnée
+        if (this.selectedClasseId) {
+          this.chargerNotes();
         }
-      },
-      error: (err: any) => console.error("Erreur récupération professeur:", err)
-    });
-  }
+      }
+    },
+    error: (err: any) => console.error("Erreur récupération professeur:", err)
+  });
+}
 
   onFiltresChange() {
     if (this.selectedClasseId && this.selectedMatiereId) {
